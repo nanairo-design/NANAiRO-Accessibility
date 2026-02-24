@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  plan      String
+  createdAt DateTime @default(now())
+  domains   Domain[]
+}
+
+model Domain {
+  id        String    @id @default(cuid())
+  tenantId  String
+  domain    String    @unique
+  apiKey    String    @unique
+  createdAt DateTime  @default(now())
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  settings  Setting?
+  usageLogs UsageLog[]
+
+  @@index([tenantId])
+}
+
+model Setting {
+  id           String   @id @default(cuid())
+  domainId      String   @unique
+  version       String   @default("1.0.0")
+  theme         String   @default("light")
+  position      String   @default("right")
+  tts           Boolean  @default(true)
+  contrast      Boolean  @default(true)
+  translate     Boolean  @default(false)
+  grayscale     Boolean  @default(true)
+  focus         Boolean  @default(true)
+  linkHighlight Boolean  @default(true)
+  textSize      Boolean  @default(true)
+  updatedAt     DateTime @updatedAt
+  domain        Domain   @relation(fields: [domainId], references: [id], onDelete: Cascade)
+}
+
+model UsageLog {
+  id        String   @id @default(cuid())
+  domainId  String
+  event     String
+  payload   String?
+  timestamp DateTime @default(now())
+  domain    Domain   @relation(fields: [domainId], references: [id], onDelete: Cascade)
+
+  @@index([domainId, timestamp])
+}

@@ -2,14 +2,19 @@
   "name": "nanairo-web-sdk",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "packageManager": "npm@10.9.0",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "test": "node --test packages/core/test/*.test.js",
-    "lint": "node --check packages/core/src/config.js packages/loader/src/loader.js packages/widget/src/widget-core.js apps/api/config-service.js apps/api/dev-server.js",
-    "dev": "node apps/api/dev-server.js"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "turbo run format"
+  },
+  "devDependencies": {
+    "turbo": "^2.1.2"
   }
 }
