@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NANAiRO Web SDK Demo</title>
+    <style>
+      body { font-family: sans-serif; line-height: 1.6; margin: 0; padding: 24px; }
+      main { max-width: 760px; margin: 0 auto; }
+      h1 { margin-top: 0; }
+      .note { background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 8px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>NANAiRO Web SDK デモページ</h1>
+      <p>このページは、既存サイトに 1 行スクリプトで組み込まれる UX 介入レイヤーの動作確認用です。</p>
+      <p class="note">右下（または設定で左下）に表示される丸ボタンを押すと、文字サイズ・コントラスト・読み上げを試せます。</p>
+    </main>
+
+    <script type="module">
+      import { initNanairoLoader } from '/packages/loader/src/loader.js';
+
+      initNanairoLoader({
+        siteKey: 'demo-site-key',
+        apiBaseUrl: window.location.origin,
+        cdnBaseUrl: `${window.location.origin}/docs/demo/cdn`
+      });
+    </script>
+  </body>
+</html>
