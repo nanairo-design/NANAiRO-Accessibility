@@ -78,10 +78,11 @@ h1 span { color: var(--teal); }
 .mission-statement p, .mission-copy > p { color: var(--muted); font-size: 14px; line-height: 2; }
 .mission-copy > .eyebrow { margin-bottom: 14px; }
 .meaning-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; list-style: none; margin: 44px 0 0; padding: 0; }
-.meaning-list li { display: grid; grid-template-columns: 32px 1fr; align-content: start; gap: 14px; padding: 24px 0; border-top: 1px solid var(--line); }
-.meaning-list b { color: var(--teal); font-size: 12px; }
-.meaning-list strong { font-size: 14px; }
-.meaning-list p { margin: 5px 0 0; font-size: 12px; color: var(--muted); line-height: 1.8; }
+.meaning-list li { position: relative; display: grid; grid-template-columns: 52px 1fr; align-content: start; gap: 18px; min-height: 190px; padding: 30px 26px; overflow: hidden; border: 1px solid #dce8e2; border-radius: 22px; background: linear-gradient(145deg, #fff 20%, #f0f6f2); box-shadow: 0 14px 32px #285c600d; }
+.meaning-list li::after { content: ""; position: absolute; right: -35px; bottom: -50px; width: 130px; height: 130px; border-radius: 50%; background: #86b69618; }
+.meaning-list b { position: relative; z-index: 1; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; color: #fff; background: var(--teal); box-shadow: 0 8px 18px #285c6030; font-size: 13px; }
+.meaning-list strong { position: relative; z-index: 1; display: block; margin-top: 10px; font-size: 17px; line-height: 1.55; }
+.meaning-list p { position: relative; z-index: 1; margin: 12px 0 0; font-size: 12px; color: var(--muted); line-height: 1.9; }
 .evidence-section { position: relative; }
 .evidence-section::before { content: ""; position: absolute; inset: 34px -4% 12px; z-index: -1; border-radius: 42px; background: linear-gradient(135deg, #f3f7f4, #f8faf8 55%, #edf4f2); }
 .research-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: stretch; }
