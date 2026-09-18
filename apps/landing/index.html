@@ -46,7 +46,7 @@
       .hero-copy .lead { font-size: 17px; line-height: 1.65; }
       .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 28px; }
       .primary, .secondary { min-height: 52px; display: inline-flex; align-items: center; justify-content: center; padding: 0 21px; border-radius: 16px; font-size: 14px; font-weight: 750; text-decoration: none; }
-      .primary { color: white; border: 1px solid rgba(255,255,255,.3); background: linear-gradient(135deg, #3c873f, #16806b 52%, #17666b); box-shadow: inset 0 1px rgba(255,255,255,.28), 0 13px 30px rgba(27,125,121,.24); }
+      .primary { cursor: pointer; color: white; border: 1px solid rgba(255,255,255,.3); background: linear-gradient(135deg, #3c873f, #16806b 52%, #17666b); box-shadow: inset 0 1px rgba(255,255,255,.28), 0 13px 30px rgba(27,125,121,.24); }
       .secondary { color: #176b69; border: 1px solid rgba(31,130,126,.14); background: rgba(255,255,255,.92); box-shadow: inset 0 1px rgba(255,255,255,.92), 0 8px 20px rgba(24,107,104,.08); backdrop-filter: blur(16px); }
       .primary:hover, .secondary:hover { transform: translateY(-2px); }
 
@@ -322,8 +322,8 @@ init({
 
       <section id="try" class="section" aria-labelledby="try-title">
         <div class="callout">
-          <div><h2 id="try-title">右端の「表示サポート」から試せます。</h2><p>グリーンのアクセシビリティアイコンを押すと開きます。文字サイズやコントラストを変えて、このページで動作を確認してください。</p></div>
-          <a class="primary" href="#main">ページ上部へ</a>
+          <div><h2 id="try-title">表示サポートを、このページで体験。</h2><p>文字サイズやコントラストを変えて、実際の見え方と操作を確認できます。</p></div>
+          <button class="primary" type="button" data-open-demo aria-haspopup="dialog">デモ確認してみる</button>
         </div>
       </section>
     </main>
@@ -334,6 +334,12 @@ init({
     <script type="module" src="/src/index.ts"></script>
     <script>
       document.addEventListener('click', async (event) => {
+        const demoButton = event.target.closest('[data-open-demo]');
+        if (demoButton) {
+          document.querySelector('nanairo-accessibility')?.showPanel();
+          return;
+        }
+
         const button = event.target.closest('[data-copy]');
         if (!button) return;
         const source = document.getElementById(button.dataset.copy);

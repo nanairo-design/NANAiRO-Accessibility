@@ -100,6 +100,10 @@ export class NanairoAccessibility extends LitElement {
     this.renderRoot.querySelector<HTMLButtonElement>('.close-button')?.focus();
   }
 
+  public async showPanel(): Promise<void> {
+    await this.openPanel();
+  }
+
   private async closePanel(restoreFocus: boolean): Promise<void> {
     this.open = false;
     await this.updateComplete;
