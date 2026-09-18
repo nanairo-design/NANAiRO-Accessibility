@@ -1,20 +1,37 @@
 {
-  "name": "nanairo-web-sdk",
+  "name": "@nanairo/accessibility",
   "version": "0.1.0",
-  "private": true,
-  "packageManager": "npm@10.9.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
+  "description": "A lightweight Japanese and English accessibility preference widget.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "main": "./dist/nanairo-accessibility.iife.js",
+  "module": "./dist/nanairo-accessibility.es.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/nanairo-accessibility.es.js",
+      "default": "./dist/nanairo-accessibility.iife.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck",
-    "format": "turbo run format"
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "preview": "vite preview --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "lit": "^3.3.1"
   },
   "devDependencies": {
-    "turbo": "^2.1.2"
+    "@types/node": "^24.5.2",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.7",
+    "vitest": "^3.2.4"
   }
 }

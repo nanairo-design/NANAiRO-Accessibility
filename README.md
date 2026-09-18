@@ -1,76 +1,95 @@
-# NANAiRO Web SDK
+# NANAiRO Accessibility
 
-NANAiRO Web SDK は、既存Webサイトに後付けで挿入できる **UX介入レイヤー** です。
-単なるアクセシビリティツールではなく、以下の三層を提供します。
+Webサイトを見やすくし、より多くの人へ情報を届けるための表示サポートツールです。
 
-- DOM制御エンジン
-- UX変更レイヤー
-- SaaS制御型ウィジェット
+画面右端の「表示サポート」から、閲覧者自身が文字・色・動き・読み上げなどを調整できます。日本語と英語に対応し、React・VueなどのWebアプリにも、通常のHTMLやWordPressにも導入できます。
 
-## アーキテクチャ
-
-```txt
-Client Website
-   ↓
-loader.js（固定）
-   ↓
-Config API 取得
-   ↓
-CDNから widget-core-${version}.js を動的 import
-   ↓
-Shadow DOM 内で UI 描画
-```
-
-## 実装済み（Phase 1 / MVP）
-
-- Loader
-  - siteKeyでRemote Config取得
-  - API失敗時はデフォルト設定へフォールバック
-  - CDN上のバージョン付きwidgetを動的ロード
-- Widget
-  - フローティングボタン
-  - サイドパネル
-  - 文字サイズ変更
-  - コントラスト切替
-  - テキスト読み上げ（1x/1.5x/停止）
-- API（サンプル）
-  - ドメイン（siteKey）ごとの設定返却
-
-## 画面の見方（ローカルデモ）
+## デモサイト
 
 ```bash
+npm install
 npm run dev
 ```
 
-起動後、ブラウザで `http://localhost:4173` を開いてください。
+起動後、`http://127.0.0.1:5173/`を開いてください。
 
-- ページ右下（設定次第で左下）の丸ボタンでパネルを開閉
-- 「文字 + / 文字 -」で文字サイズ変更
-- 「コントラスト切替」で高コントラスト表示
-- 「読み上げ 1x / 1.5x / 停止」でTTS
+## 主な機能
 
-> 組み込み例は `docs/demo/index.html` の `<script type="module">` で確認できます。
+- 文字サイズの変更
+- 行間・文字間隔の調整
+- リンクの強調
+- 高コントラストテーマ
+- 読みやすいフォント
+- 動きの軽減
+- リーディングガイド／マスク
+- ブラウザ音声合成による読み上げ
+- ページ内メディアの一括停止・ミュート
+- 日本語／英語切り替え
+- 表示設定のブラウザ内保存
 
-## セキュリティ方針（実装反映）
+## 導入方法
 
-- UIはShadow DOMで隔離
-- `innerHTML` は使わず DOM API でUI構築
-- Config取得失敗時も最低動作を継続
+### npm版
 
-## 開発
+React、Vue、Next.jsなど、npmを利用するサイト向けです。
 
 ```bash
+npm install ./nanairo-accessibility-0.1.0.tgz
+```
+
+```ts
+import { init } from '@nanairo/accessibility';
+
+init({
+  locale: 'ja',
+  position: 'right',
+});
+```
+
+### CDN／セルフホスト版
+
+`public/downloads/nanairo-accessibility-cdn-0.1.0.zip`を展開し、JavaScriptファイルをWebサーバーへ配置します。その後、全ページで共通するHTMLの`</body>`直前へ以下を追加します。
+
+```html
+<script
+  src="/assets/nanairo-accessibility.iife.js"
+  data-nanairo-auto
+  data-locale="ja"
+  data-position="right"
+  defer
+></script>
+```
+
+## JavaScript API
+
+```ts
+import { init } from '@nanairo/accessibility';
+
+const widget = init({ locale: 'ja', position: 'right' });
+
+// 外部のデモボタンなどからパネルを開く
+widget.showPanel();
+
+widget.addEventListener('nanairo-change', (event) => {
+  console.log(event.detail);
+});
+```
+
+## 開発・検証
+
+```bash
+npm run typecheck
 npm test
-npm run lint
-npm run dev
+npm run build
 ```
 
-## アクセシビリティLP／配布版
+ビルド成果物は`dist/`へ生成されます。
 
-`apps/landing`に、NANAiRO Accessibilityのランディングページと埋め込みウィジェットを収録しています。
+## 配布ファイル
 
-```bash
-npm run dev -w @nanairo/accessibility
-```
+- npm版：`public/downloads/nanairo-accessibility-0.1.0.tgz`
+- CDN／セルフホスト版：`public/downloads/nanairo-accessibility-cdn-0.1.0.zip`
 
-起動後、`http://127.0.0.1:5173/`でLPとウィジェットを確認できます。配布用のnpm版・CDN／セルフホスト版は`apps/landing/public/downloads`に格納しています。
+## 注意事項
+
+このツールは利用者による表示のパーソナライズを支援するものです。導入するだけでWebサイト本体のWCAG適合性を保証するものではありません。コンテンツ、HTML構造、キーボード操作、代替テキストなど、サイト本体の継続的な改善と組み合わせてご利用ください。
