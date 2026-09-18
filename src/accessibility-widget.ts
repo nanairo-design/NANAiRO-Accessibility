@@ -245,14 +245,15 @@ export class NanairoAccessibility extends LitElement {
         </span>
       </button>
 
-      ${this.open ? html`
-        <section
-          id=${this.panelId}
-          class="panel"
-          role="dialog"
-          aria-modal="false"
-          aria-labelledby="nanairo-panel-title"
-        >
+      <section
+        id=${this.panelId}
+        class=${this.open ? 'panel is-open' : 'panel'}
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="nanairo-panel-title"
+        aria-hidden=${this.open ? 'false' : 'true'}
+        ?inert=${!this.open}
+      >
           <div class="glass-light glass-light-one" aria-hidden="true"></div>
           <div class="glass-light glass-light-two" aria-hidden="true"></div>
 
@@ -346,8 +347,7 @@ export class NanairoAccessibility extends LitElement {
             <span class="footer-brand" aria-hidden="true"><img src=${logoHorizontalUrl} alt="" /></span>
           </footer>
           <span class="sr-only" aria-live="polite">${this.announcement || nothing}</span>
-        </section>
-      ` : nothing}
+      </section>
     `;
   }
 
@@ -357,12 +357,11 @@ export class NanairoAccessibility extends LitElement {
       --accent-soft: #49ad70;
       --ink: #183f3d;
       --muted: #5d706b;
-      --drawer-width: min(420px, calc(100vw - 64px));
+      --drawer-width: min(420px, calc(100vw - 46px));
       position: fixed;
       z-index: 2147483646;
       right: 0;
-      top: 50%;
-      margin-top: -41px;
+      top: 0;
       color: var(--ink);
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -378,16 +377,18 @@ export class NanairoAccessibility extends LitElement {
     svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
     .launcher {
-      position: relative;
+      position: fixed;
+      z-index: 2;
+      right: 0;
+      top: 50%;
       display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 14px;
-      width: 174px;
-      min-height: 82px;
-      padding: 14px 20px 14px 16px;
-      margin-left: auto;
+      gap: 10px;
+      width: 122px;
+      min-height: 58px;
+      padding: 9px 12px 9px 10px;
       overflow: hidden;
       cursor: pointer;
       color: white;
@@ -402,26 +403,27 @@ export class NanairoAccessibility extends LitElement {
         -2px 2px 8px rgba(27,107,106,.12);
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
-      transition: width .28s cubic-bezier(.2,.8,.2,1), transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, filter .28s ease;
+      transform: translateY(-50%);
+      transition: right .48s cubic-bezier(.22,.8,.2,1), left .48s cubic-bezier(.22,.8,.2,1), width .42s cubic-bezier(.22,.8,.2,1), min-height .42s cubic-bezier(.22,.8,.2,1), padding .42s ease, border-radius .42s ease, box-shadow .42s ease, filter .28s ease;
       animation: launcher-invite 1.8s ease-out 1s 2;
     }
 
-    :host([position="left"]) .launcher { margin-right: auto; margin-left: 0; border-right: 1px solid rgba(255,255,255,.64); border-left: 0; border-radius: 0 13px 13px 0; box-shadow: inset 0 1px 1px rgba(255,255,255,.56), inset 0 -10px 22px rgba(20,97,96,.12), 10px 14px 36px rgba(27,107,106,.2), 2px 2px 8px rgba(27,107,106,.12); }
+    :host([position="left"]) .launcher { right: auto; left: 0; border-right: 1px solid rgba(255,255,255,.64); border-left: 0; border-radius: 0 13px 13px 0; box-shadow: inset 0 1px 1px rgba(255,255,255,.56), inset 0 -10px 22px rgba(20,97,96,.12), 10px 14px 36px rgba(27,107,106,.2), 2px 2px 8px rgba(27,107,106,.12); }
     :host([position="left"]) .launcher { animation-name: launcher-invite-left; }
-    .launcher:hover { width: 184px; filter: brightness(1.05); box-shadow: inset 0 1px 1px rgba(255,255,255,.7), inset 0 -10px 22px rgba(20,97,96,.1), -15px 18px 42px rgba(27,107,106,.28), -3px 3px 10px rgba(27,107,106,.16); }
-    .launcher:active { transform: scale(.97); }
+    .launcher:hover { width: 130px; filter: brightness(1.05); box-shadow: inset 0 1px 1px rgba(255,255,255,.7), inset 0 -10px 22px rgba(20,97,96,.1), -15px 18px 42px rgba(27,107,106,.28), -3px 3px 10px rgba(27,107,106,.16); }
+    .launcher:active { transform: translateY(-50%) scale(.97); }
     .launcher:focus-visible, button:focus-visible, select:focus-visible { outline: 3px solid #237f82; outline-offset: 3px; }
-    .launcher-mark { position: relative; width: 52px; height: 52px; display: grid; place-items: center; flex: none; color: #23977f; border-radius: 50%; background: #fff; box-shadow: 0 7px 16px rgba(16,91,87,.2), inset 0 0 0 1px rgba(255,255,255,.8); }
-    .launcher-mark svg { width: 33px; height: 33px; stroke-width: 1.8; }
-    .launcher-label { display: grid; justify-items: start; gap: 2px; font-size: 14px; font-weight: 800; letter-spacing: .06em; line-height: 1.08; text-align: left; writing-mode: horizontal-tb; }
-    .launcher-arrow { display: none; place-items: center; }
-    .launcher-arrow svg { width: 32px; height: 32px; stroke-width: 1.6; }
-    .launcher[aria-expanded="true"] { position: fixed; z-index: 2; right: var(--drawer-width); top: 50%; width: 64px; min-height: 84px; padding: 0; border-radius: 14px 0 0 14px; animation: none; transform: translateY(-50%); }
-    .launcher[aria-expanded="true"]:hover { width: 64px; }
+    .launcher-mark { position: relative; width: 36px; height: 36px; display: grid; place-items: center; flex: none; color: #23977f; border-radius: 50%; background: #fff; box-shadow: 0 5px 12px rgba(16,91,87,.2), inset 0 0 0 1px rgba(255,255,255,.8); transition: opacity .18s ease, transform .28s ease; }
+    .launcher-mark svg { width: 23px; height: 23px; stroke-width: 1.8; }
+    .launcher-label { display: grid; justify-items: start; gap: 1px; font-size: 10px; font-weight: 800; letter-spacing: .05em; line-height: 1.08; text-align: left; writing-mode: horizontal-tb; transition: opacity .18s ease, transform .28s ease; }
+    .launcher-arrow { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: translateX(8px); transition: opacity .22s ease .12s, transform .36s cubic-bezier(.22,.8,.2,1) .08s; }
+    .launcher-arrow svg { width: 24px; height: 24px; stroke-width: 1.7; }
+    .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 46px; min-height: 62px; padding: 0; border-radius: 12px 0 0 12px; animation: none; }
+    .launcher[aria-expanded="true"]:hover { width: 46px; }
     .launcher[aria-expanded="true"]:active { transform: translateY(-50%) scale(.97); }
     .launcher[aria-expanded="true"] .launcher-mark,
-    .launcher[aria-expanded="true"] .launcher-label { display: none; }
-    .launcher[aria-expanded="true"] .launcher-arrow { display: grid; }
+    .launcher[aria-expanded="true"] .launcher-label { opacity: 0; transform: scale(.84); }
+    .launcher[aria-expanded="true"] .launcher-arrow { opacity: 1; transform: translateX(0); }
     :host([position="left"]) .launcher[aria-expanded="true"] { right: auto; left: var(--drawer-width); border-radius: 0 14px 14px 0; }
     :host([position="left"]) .launcher[aria-expanded="true"] .launcher-arrow { transform: scaleX(-1); }
 
@@ -448,10 +450,15 @@ export class NanairoAccessibility extends LitElement {
       backdrop-filter: blur(38px) saturate(175%);
       -webkit-backdrop-filter: blur(38px) saturate(175%);
       transform-origin: center right;
-      animation: drawer-in .42s cubic-bezier(.2,.85,.22,1) both;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: transform .48s cubic-bezier(.22,.8,.2,1), opacity .34s ease;
     }
 
-    :host([position="left"]) .panel { right: auto; left: 0; border-radius: 0 32px 32px 0; transform-origin: center left; animation-name: drawer-in-left; }
+    .panel.is-open { pointer-events: auto; opacity: 1; transform: translateX(0); }
+    :host([position="left"]) .panel { right: auto; left: 0; border-radius: 0 32px 32px 0; transform: translateX(-100%); }
+    :host([position="left"]) .panel.is-open { transform: translateX(0); }
     .panel::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit; background: linear-gradient(120deg, rgba(255,255,255,.55), transparent 28%, transparent 68%, rgba(34,170,158,.13)); }
     .glass-light { position: absolute; z-index: -1; pointer-events: none; border-radius: 50%; filter: blur(30px); opacity: .42; }
     .glass-light-one { width: 190px; height: 130px; top: -70px; left: -30px; background: #9dcc47; }
@@ -515,36 +522,26 @@ export class NanairoAccessibility extends LitElement {
     .footer-brand img { width: 84px; height: auto; object-fit: contain; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
-    @keyframes drawer-in {
-      from { opacity: .3; transform: translateX(100%); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes drawer-in-left {
-      from { opacity: .3; transform: translateX(-100%); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
     @keyframes launcher-invite {
-      0%, 100% { transform: translateX(0); }
-      45% { transform: translateX(-5px); }
+      0%, 100% { transform: translate(0, -50%); }
+      45% { transform: translate(-4px, -50%); }
     }
 
     @keyframes launcher-invite-left {
-      0%, 100% { transform: translateX(0); }
-      45% { transform: translateX(5px); }
+      0%, 100% { transform: translate(0, -50%); }
+      45% { transform: translate(4px, -50%); }
     }
 
     @media (max-width: 520px) {
-      :host { --drawer-width: calc(100vw - 54px); margin-top: -36px; }
-      .launcher { width: 154px; min-height: 72px; gap: 11px; padding: 11px 15px 11px 12px; border-radius: 11px 0 0 11px; }
+      :host { --drawer-width: calc(100vw - 42px); }
+      .launcher { width: 108px; min-height: 51px; gap: 8px; padding: 7px 10px 7px 8px; border-radius: 10px 0 0 10px; }
       :host([position="left"]) .launcher { border-radius: 0 11px 11px 0; }
-      .launcher:hover { width: 160px; }
-      .launcher-mark { width: 46px; height: 46px; }
-      .launcher-mark svg { width: 29px; height: 29px; }
-      .launcher-label { font-size: 12px; }
-      .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 54px; min-height: 74px; border-radius: 12px 0 0 12px; }
-      .launcher[aria-expanded="true"]:hover { width: 54px; }
+      .launcher:hover { width: 114px; }
+      .launcher-mark { width: 32px; height: 32px; }
+      .launcher-mark svg { width: 20px; height: 20px; }
+      .launcher-label { font-size: 9px; }
+      .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 42px; min-height: 58px; border-radius: 11px 0 0 11px; }
+      .launcher[aria-expanded="true"]:hover { width: 42px; }
       :host([position="left"]) .launcher[aria-expanded="true"] { right: auto; left: var(--drawer-width); border-radius: 0 12px 12px 0; }
       .panel { border-radius: 24px 0 0 24px; }
       :host([position="left"]) .panel { border-radius: 0 24px 24px 0; }
