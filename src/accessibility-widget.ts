@@ -344,7 +344,10 @@ export class NanairoAccessibility extends LitElement {
 
           <footer class="panel-footer">
             <button class="reset-button" type="button" @click=${this.reset}>${icon('reset')}<span>${this.t('reset')}</span></button>
-            <span class="footer-brand" aria-hidden="true"><img src=${logoHorizontalUrl} alt="" /></span>
+            <span class="footer-brand">
+              <span class="powered-by">Powered by</span>
+              <img src=${logoHorizontalUrl} alt="NANAiRO" />
+            </span>
           </footer>
           <span class="sr-only" aria-live="polite">${this.announcement || nothing}</span>
       </section>
@@ -518,8 +521,9 @@ export class NanairoAccessibility extends LitElement {
     .reset-button { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 7px 11px; cursor: pointer; color: #566175; border: 1px solid transparent; border-radius: 11px; background: transparent; font-size: 12px; font-weight: 650; }
     .reset-button:hover { color: #176f70; border-color: rgba(31,145,137,.14); background: rgba(255,255,255,.5); }
     .reset-button svg { width: 17px; height: 17px; }
-    .footer-brand { display: inline-flex; align-items: center; }
-    .footer-brand img { width: 84px; height: auto; object-fit: contain; }
+    .footer-brand { display: inline-flex; align-items: center; gap: 7px; color: #7b8596; white-space: nowrap; }
+    .powered-by { font-size: 9px; font-weight: 650; letter-spacing: .04em; }
+    .footer-brand img { width: 72px; height: auto; object-fit: contain; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
     @keyframes launcher-invite {
