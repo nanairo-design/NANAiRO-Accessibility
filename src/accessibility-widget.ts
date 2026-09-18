@@ -35,6 +35,7 @@ const icon = (name: 'spark' | 'accessibility' | 'close' | 'minus' | 'plus' | 'ty
 export class NanairoAccessibility extends LitElement {
   @property({ type: String, reflect: true }) locale: Locale = 'ja';
   @property({ type: String, reflect: true }) position: 'left' | 'right' = 'right';
+  @property({ type: Boolean, attribute: 'show-branding' }) showBranding = true;
 
   @state() private open = false;
   @state() private preferences: Preferences = defaultPreferences();
@@ -376,10 +377,12 @@ export class NanairoAccessibility extends LitElement {
 
           <footer class="panel-footer">
             <button class="reset-button" type="button" @click=${this.reset}>${icon('reset')}<span>${this.t('reset')}</span></button>
-            <span class="footer-brand">
-              <span class="powered-by">Powered by</span>
-              <img src=${logoHorizontalUrl} alt="NANAiRO" />
-            </span>
+            ${this.showBranding ? html`
+              <span class="footer-brand">
+                <span class="powered-by">Powered by</span>
+                <img src=${logoHorizontalUrl} alt="NANAiRO" />
+              </span>
+            ` : nothing}
           </footer>
           <span class="sr-only" aria-live="polite">${this.announcement || nothing}</span>
       </section>

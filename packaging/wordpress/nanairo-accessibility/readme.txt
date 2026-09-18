@@ -18,6 +18,8 @@ Visitors can choose the presentation that is easier for them to use. Available c
 
 The widget supports Japanese and English. Preferences are stored only in the visitor's browser. The plugin does not send browsing data or personal information to an external service.
 
+The optional "Powered by NANAiRO" credit is disabled by default. Site administrators can enable it from the plugin settings.
+
 This plugin supports presentation preferences. Installing it does not automatically guarantee that the website itself conforms to WCAG or another accessibility standard.
 
 Human-readable source and build configuration are included in the `source` directory.

@@ -30,9 +30,10 @@ define( 'NANAIRO_ACCESSIBILITY_OPTION', 'nanairo_accessibility_options' );
  */
 function nanairo_accessibility_default_options() {
 	return array(
-		'enabled'  => true,
-		'locale'   => 'ja',
-		'position' => 'right',
+		'enabled'       => true,
+		'locale'        => 'ja',
+		'position'      => 'right',
+		'show_branding' => false,
 	);
 }
 
@@ -46,9 +47,10 @@ function nanairo_accessibility_sanitize_options( $input ) {
 	$input = is_array( $input ) ? $input : array();
 
 	return array(
-		'enabled'  => ! empty( $input['enabled'] ),
-		'locale'   => isset( $input['locale'] ) && 'en' === $input['locale'] ? 'en' : 'ja',
-		'position' => isset( $input['position'] ) && 'left' === $input['position'] ? 'left' : 'right',
+		'enabled'       => ! empty( $input['enabled'] ),
+		'locale'        => isset( $input['locale'] ) && 'en' === $input['locale'] ? 'en' : 'ja',
+		'position'      => isset( $input['position'] ) && 'left' === $input['position'] ? 'left' : 'right',
+		'show_branding' => ! empty( $input['show_branding'] ),
 	);
 }
 
@@ -93,6 +95,14 @@ function nanairo_accessibility_register_settings() {
 		'nanairo_accessibility_position',
 		esc_html__( 'Button position', 'nanairo-accessibility' ),
 		'nanairo_accessibility_render_position_field',
+		'nanairo-accessibility',
+		'nanairo_accessibility_display'
+	);
+
+	add_settings_field(
+		'nanairo_accessibility_show_branding',
+		esc_html__( 'Credit display', 'nanairo-accessibility' ),
+		'nanairo_accessibility_render_branding_field',
 		'nanairo-accessibility',
 		'nanairo_accessibility_display'
 	);
@@ -156,6 +166,20 @@ function nanairo_accessibility_render_position_field() {
 }
 
 /**
+ * Render the optional credit field.
+ */
+function nanairo_accessibility_render_branding_field() {
+	$options = nanairo_accessibility_get_options();
+	?>
+	<label>
+		<input type="checkbox" name="<?php echo esc_attr( NANAIRO_ACCESSIBILITY_OPTION ); ?>[show_branding]" value="1" <?php checked( ! empty( $options['show_branding'] ) ); ?> />
+		<?php echo esc_html__( 'Show the “Powered by NANAiRO” credit in the widget footer', 'nanairo-accessibility' ); ?>
+	</label>
+	<p class="description"><?php echo esc_html__( 'Optional and disabled by default.', 'nanairo-accessibility' ); ?></p>
+	<?php
+}
+
+/**
  * Add the settings page.
  */
 function nanairo_accessibility_add_settings_page() {
@@ -204,8 +228,9 @@ function nanairo_accessibility_enqueue_widget() {
 	$handle = 'nanairo-accessibility';
 	$src    = plugin_dir_url( __FILE__ ) . 'assets/js/nanairo-accessibility.iife.js';
 	$config = array(
-		'locale'   => 'en' === $options['locale'] ? 'en' : 'ja',
-		'position' => 'left' === $options['position'] ? 'left' : 'right',
+		'locale'       => 'en' === $options['locale'] ? 'en' : 'ja',
+		'position'     => 'left' === $options['position'] ? 'left' : 'right',
+		'showBranding' => ! empty( $options['show_branding'] ),
 	);
 
 	wp_enqueue_script( $handle, $src, array(), NANAIRO_ACCESSIBILITY_VERSION, true );

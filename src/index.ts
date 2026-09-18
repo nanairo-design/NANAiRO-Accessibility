@@ -5,6 +5,7 @@ import type { NanairoAccessibility } from './accessibility-widget';
 export interface NanairoOptions {
   locale?: Locale;
   position?: 'left' | 'right';
+  showBranding?: boolean;
 }
 
 export function init(options: NanairoOptions = {}): NanairoAccessibility {
@@ -14,6 +15,7 @@ export function init(options: NanairoOptions = {}): NanairoAccessibility {
   const widget = document.createElement('nanairo-accessibility');
   widget.setAttribute('locale', options.locale ?? 'ja');
   widget.setAttribute('position', options.position ?? 'right');
+  widget.showBranding = options.showBranding ?? true;
   document.body.append(widget);
   return widget;
 }
@@ -26,7 +28,8 @@ const autoScript = document.querySelector<HTMLScriptElement>('script[data-nanair
 if (autoScript) {
   const locale = autoScript.dataset.locale === 'en' ? 'en' : 'ja';
   const position = autoScript.dataset.position === 'left' ? 'left' : 'right';
-  const start = () => init({ locale, position });
+  const showBranding = autoScript.dataset.showBranding !== 'false';
+  const start = () => init({ locale, position, showBranding });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
   else start();
 }

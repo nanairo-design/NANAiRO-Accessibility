@@ -45,6 +45,7 @@ import { init } from '@nanairo/accessibility';
 init({
   locale: 'ja',
   position: 'right',
+  showBranding: true,
 });
 ```
 
@@ -58,6 +59,7 @@ init({
   data-nanairo-auto
   data-locale="ja"
   data-position="right"
+  data-show-branding="true"
   defer
 ></script>
 ```
@@ -73,7 +75,7 @@ init({
 ```ts
 import { init } from '@nanairo/accessibility';
 
-const widget = init({ locale: 'ja', position: 'right' });
+const widget = init({ locale: 'ja', position: 'right', showBranding: true });
 
 // 外部のデモボタンなどからパネルを開く
 widget.showPanel();
