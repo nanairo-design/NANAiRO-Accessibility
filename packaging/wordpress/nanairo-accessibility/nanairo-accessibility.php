@@ -4,14 +4,13 @@
  * Plugin URI:        https://github.com/nanairo-design/NANAiRO-Accessibility-wordpress-plugin
  * Description:       Adds the NANAiRO display support widget for text, contrast, reading assistance, speech, and media controls.
  * Version:           0.1.0
- * Requires at least: 6.0
+ * Requires at least: 6.3
  * Requires PHP:      7.4
  * Author:            一般社団法人ナナイロ
  * Author URI:        https://nanairo.design/
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       nanairo-accessibility
- * Domain Path:       /languages
  *
  * @package NANAiRO_Accessibility
  */
@@ -233,7 +232,16 @@ function nanairo_accessibility_enqueue_widget() {
 		'showBranding' => ! empty( $options['show_branding'] ),
 	);
 
-	wp_enqueue_script( $handle, $src, array(), NANAIRO_ACCESSIBILITY_VERSION, true );
+	wp_enqueue_script(
+		$handle,
+		$src,
+		array(),
+		NANAIRO_ACCESSIBILITY_VERSION,
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
+	);
 	wp_add_inline_script(
 		$handle,
 		'window.NanairoAccessibility && window.NanairoAccessibility.init(' . wp_json_encode( $config ) . ');',
