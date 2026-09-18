@@ -64,3 +64,13 @@ npm test
 npm run lint
 npm run dev
 ```
+
+## アクセシビリティLP／配布版
+
+`apps/landing`に、NANAiRO Accessibilityのランディングページと埋め込みウィジェットを収録しています。
+
+```bash
+npm run dev -w @nanairo/accessibility
+```
+
+起動後、`http://127.0.0.1:5173/`でLPとウィジェットを確認できます。配布用のnpm版・CDN／セルフホスト版は`apps/landing/public/downloads`に格納しています。
