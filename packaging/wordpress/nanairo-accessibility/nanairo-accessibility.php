@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       NANAiRO Accessibility
- * Plugin URI:        https://github.com/nanairo-design/NANAiRO-Accessibility
+ * Plugin URI:        https://github.com/nanairo-design/NANAiRO-Accessibility-wordpress-plugin
  * Description:       Adds the NANAiRO display support widget for text, contrast, reading assistance, speech, and media controls.
  * Version:           0.1.0
  * Requires at least: 6.0
