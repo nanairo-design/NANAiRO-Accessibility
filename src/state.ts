@@ -64,7 +64,7 @@ export function loadPreferences(fallbackLocale: Locale): Preferences {
       ...fallback,
       ...value,
       locale: isLocale(value.locale) ? value.locale : fallbackLocale,
-      textScale: Math.max(0, Math.min(4, Number(value.textScale) || 0)),
+      textScale: Math.max(0, Math.min(5, Number(value.textScale) || 0)),
       colorMode,
       highContrast: colorMode === 'high-contrast',
     };

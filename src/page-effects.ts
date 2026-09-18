@@ -9,6 +9,7 @@ html[data-nanairo-text-scale="1"] { font-size: 112.5%; }
 html[data-nanairo-text-scale="2"] { font-size: 125%; }
 html[data-nanairo-text-scale="3"] { font-size: 150%; }
 html[data-nanairo-text-scale="4"] { font-size: 175%; }
+html[data-nanairo-text-scale="5"] { font-size: 200%; }
 
 html[data-nanairo-spacing="comfortable"] body :where(p, li, dd, dt, blockquote, figcaption, label, input, textarea, button) {
   line-height: 1.8 !important;

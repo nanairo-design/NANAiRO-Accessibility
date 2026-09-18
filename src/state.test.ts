@@ -24,7 +24,7 @@ describe('preference storage', () => {
 
   it('clamps invalid text scale values', () => {
     savePreferences({ ...defaultPreferences('ja'), textScale: 99 });
-    expect(loadPreferences('ja').textScale).toBe(4);
+    expect(loadPreferences('ja').textScale).toBe(5);
   });
 
   it('fills newly added preferences when loading older stored settings', () => {
