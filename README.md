@@ -6,6 +6,8 @@ Webサイトを見やすくし、より多くの人へ情報を届けるため�
 
 ## デモサイト
 
+LPの配色・余白・文字組み・コンポーネントのルールは [DESIGN.md](DESIGN.md) にまとめています。LPのスタイルは `src/landing.css` で管理します。
+
 ```bash
 npm install
 npm run dev
