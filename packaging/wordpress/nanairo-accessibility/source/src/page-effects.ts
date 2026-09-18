@@ -54,6 +54,8 @@ html[data-nanairo-color="dark"] body :where(input, select, textarea, button) {
 
 html[data-nanairo-color="dark"] body a:not([data-nanairo-ignore]) {
   color: #a2e6cc !important;
+  background-color: #252a28 !important;
+  border-color: #76827d !important;
   text-decoration-color: currentColor !important;
 }
 

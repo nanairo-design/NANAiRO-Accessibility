@@ -156,6 +156,10 @@ code .accent { color: #a2d6bc; }
 .callout .primary { justify-self: center; min-height: 56px; padding-inline: 32px; }
 body > footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid var(--line); padding-block: 42px; font-size: 11px; color: var(--muted); }
 .footer-logo img { width: 140px; height: auto; display: block; }
+html[data-nanairo-color="dark"] :is(.logo, .mission-brand, .footer-logo) img,
+html[data-nanairo-color="dark"] .demo-icon {
+  filter: brightness(0) invert(1);
+}
 @media (max-width: 900px) {
   .site-header, .hero, .section, body > footer { width: calc(100% - 48px); }
   nav a { padding-inline: 12px; }
