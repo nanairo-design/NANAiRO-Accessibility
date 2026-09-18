@@ -69,33 +69,65 @@
 
       <section id="evidence" class="section evidence-section" aria-labelledby="evidence-title">
         <div class="section-intro">
-          <span class="eyebrow">ACCESSIBILITY IN NUMBERS</span>
-          <h2 id="evidence-title">Webアクセシビリティが、いま必要な理由。</h2>
-          <p>情報を受け取れることは、一部の人だけの特別な要望ではありません。利用する人の多さと、現在のWebに残る課題を最新データから見てみます。</p>
+          <span class="eyebrow">ACCESSIBILITY RESEARCH</span>
+          <h2 id="evidence-title">困難のある人から、Webの現在地を見る。</h2>
+          <p>大切なのは「障がいの数」ではなく、Webを使うときに何が壁になっているかです。日本企業の導入状況と、支援技術を使う人の声を最新調査から整理しました。</p>
         </div>
-        <div class="evidence-grid">
-          <article class="evidence-card">
-            <p class="evidence-value"><strong>約<span>16</span>%</strong><small>世界の約6人に1人</small></p>
-            <div><h3>障害のある人は約13億人</h3><p>WHOは、世界人口の約16%が重大な障害のある状態で暮らしていると推計しています。読みやすい情報設計は、多くの人に関わる基盤です。</p></div>
-            <a href="https://www.who.int/news-room/fact-sheets/detail/disability-and-health" target="_blank" rel="noopener noreferrer">WHO「Disability and health」↗</a>
+        <div class="research-grid">
+          <article class="research-card research-card-wide">
+            <header><span class="research-kicker">JAPAN · 2025</span><h3>日本企業のアクセシビリティ導入状況</h3><p>ホームページを開設する企業のうち、JIS X 8341-3の適合レベルを満たす企業は4.6%。対応中・関連する取組を含めても27.3%です。</p></header>
+            <div class="adoption-highlight"><strong>4.6<small>%</small></strong><span>JIS適合レベルを<br />満たしている</span></div>
+            <figure class="chart-block">
+              <figcaption>企業の回答内訳</figcaption>
+              <div class="stacked-bar" role="img" aria-label="JIS適合4.6%、対応中14.2%、関連する取組8.5%、知っているが未対応18.5%、知らなかった51.2%、無回答3.0%">
+                <span class="segment segment-a" style="--value:4.6"></span><span class="segment segment-b" style="--value:14.2"></span><span class="segment segment-c" style="--value:8.5"></span><span class="segment segment-d" style="--value:18.5"></span><span class="segment segment-e" style="--value:51.2"></span><span class="segment segment-f" style="--value:3"></span>
+              </div>
+              <ul class="chart-legend">
+                <li><i class="segment-a"></i><span>JIS適合</span><b>4.6%</b></li><li><i class="segment-b"></i><span>適合へ対応中</span><b>14.2%</b></li><li><i class="segment-c"></i><span>関連する取組あり</span><b>8.5%</b></li><li><i class="segment-d"></i><span>認知・未対応</span><b>18.5%</b></li><li><i class="segment-e"></i><span>知らなかった</span><b>51.2%</b></li><li><i class="segment-f"></i><span>無回答</span><b>3.0%</b></li>
+              </ul>
+            </figure>
+            <a class="research-source" href="https://www.e-stat.go.jp/stat-search/files?bunya_l=11&amp;layout=dataset&amp;page=1&amp;stat_infid=000040458753&amp;toukei=00200356" target="_blank" rel="noopener noreferrer">総務省「令和7年通信利用動向調査」企業編 ↗</a>
           </article>
-          <article class="evidence-card">
-            <p class="evidence-value"><strong><span>95.9</span>%</strong><small>100万ページを調査</small></p>
-            <div><h3>ほとんどのトップページに課題</h3><p>2026年の調査では、95.9%のページから自動検出可能なWCAG 2の適合エラーが見つかりました。</p></div>
-            <a href="https://webaim.org/projects/million/" target="_blank" rel="noopener noreferrer">WebAIM Million 2026 ↗</a>
+          <article class="research-card">
+            <header><span class="research-kicker">BARRIERS · 2025</span><h3>ユーザーは、何に困っている？</h3><p>支援技術を使ってオンラインで作業するときに直面する障壁。ツールより、Webサイト側の設計や実装が上位を占めます。</p></header>
+            <figure class="chart-block">
+              <figcaption>オンライン上の障壁（複数回答）</figcaption>
+              <ul class="bar-chart">
+                <li><span>不適切な実装</span><i><b style="--value:34"></b></i><strong>34%</strong></li>
+                <li><span>ポップアップ等</span><i><b style="--value:26"></b></i><strong>26%</strong></li>
+                <li><span>複雑さ・認知負荷</span><i><b style="--value:26"></b></i><strong>26%</strong></li>
+                <li><span>フォーム操作</span><i><b style="--value:23"></b></i><strong>23%</strong></li>
+                <li><span>ラベル不足</span><i><b style="--value:22"></b></i><strong>22%</strong></li>
+                <li><span>画像だけの情報</span><i><b style="--value:19"></b></i><strong>19%</strong></li>
+              </ul>
+            </figure>
+            <a class="research-source" href="https://surveys.intopia.digital/assistive-technology-survey-2025-results/#barriers-online" target="_blank" rel="noopener noreferrer">Intopia Assistive Technology Survey 2025 ↗</a>
           </article>
-          <article class="evidence-card">
-            <p class="evidence-value"><strong><span>56.1</span>件</strong><small>1ページあたりの平均</small></p>
-            <div><h3>見過ごされる障壁が増えている</h3><p>検出されたアクセシビリティエラーは平均56.1件。前年の51件から10.1%増え、Webの複雑化とともに課題も増えています。</p></div>
-            <a href="https://webaim.org/projects/million/" target="_blank" rel="noopener noreferrer">WebAIM Million 2026 ↗</a>
+          <article class="research-card">
+            <header><span class="research-kicker">AGE &amp; GENDER · 2025</span><h3>困難は、特定の年代や性別だけではない</h3><p>18歳から90歳までが回答。平均年齢は52歳で、幅広い年代の人が支援技術を使ってWebへアクセスしています。</p></header>
+            <figure class="chart-block">
+              <figcaption>回答者の年齢構成</figcaption>
+              <ul class="bar-chart bar-chart-compact">
+                <li><span>18–24歳</span><i><b style="--value:3"></b></i><strong>3%</strong></li><li><span>25–34歳</span><i><b style="--value:11"></b></i><strong>11%</strong></li><li><span>35–44歳</span><i><b style="--value:22"></b></i><strong>22%</strong></li><li><span>45–54歳</span><i><b style="--value:18"></b></i><strong>18%</strong></li><li><span>55–64歳</span><i><b style="--value:22"></b></i><strong>22%</strong></li><li><span>65–74歳</span><i><b style="--value:17"></b></i><strong>17%</strong></li><li><span>75歳以上</span><i><b style="--value:7"></b></i><strong>7%</strong></li>
+              </ul>
+              <figcaption class="sub-caption">回答者の性別</figcaption>
+              <div class="gender-bar" role="img" aria-label="女性54%、男性38%、ノンバイナリー4%、回答しない・その他4%"><span style="--value:54">女性 54%</span><span style="--value:38">男性 38%</span><span style="--value:4"></span><span style="--value:4"></span></div>
+              <p class="chart-detail">ノンバイナリー 4% ／ 回答しない・その他 4%</p>
+            </figure>
+            <a class="research-source" href="https://surveys.intopia.digital/assistive-technology-survey-2025-results/#who-took-part" target="_blank" rel="noopener noreferrer">Intopia Assistive Technology Survey 2025 ↗</a>
           </article>
-          <article class="evidence-card">
-            <p class="evidence-value"><strong><span>83.9</span>%</strong><small>低コントラストを検出</small></p>
-            <div><h3>「読みにくさ」は最も身近な課題</h3><p>文字と背景のコントラスト不足は、調査対象の83.9%で検出されました。見え方を調整できる選択肢が情報への入口を支えます。</p></div>
-            <a href="https://webaim.org/projects/million/#contrast" target="_blank" rel="noopener noreferrer">WebAIM Million 2026 ↗</a>
+          <article class="research-card">
+            <header><span class="research-kicker">ACCESS NEEDS · 2025</span><h3>必要な支援は、一人ひとり違う</h3><p>回答者の91%が障がい・機能障害・慢性疾患のある人で、49%は複数の状態を抱えています。単一の利用者像では捉えられません。</p></header>
+            <figure class="chart-block">
+              <figcaption>回答者の属性（複数回答）</figcaption>
+              <ul class="bar-chart">
+                <li><span>全盲</span><i><b style="--value:34"></b></i><strong>34%</strong></li><li><span>ニューロダイバージェント</span><i><b style="--value:28"></b></i><strong>28%</strong></li><li><span>身体障がい</span><i><b style="--value:25"></b></i><strong>25%</strong></li><li><span>ロービジョン</span><i><b style="--value:17"></b></i><strong>17%</strong></li><li><span>ろう・難聴</span><i><b style="--value:16"></b></i><strong>16%</strong></li><li><span>精神・心理社会的障がい</span><i><b style="--value:14"></b></i><strong>14%</strong></li>
+              </ul>
+            </figure>
+            <a class="research-source" href="https://surveys.intopia.digital/assistive-technology-survey-2025-results/#disability-impairment-or-chronic-condition" target="_blank" rel="noopener noreferrer">Intopia Assistive Technology Survey 2025 ↗</a>
           </article>
         </div>
-        <p class="evidence-note">出典：WHO、WebAIM Million 2026（2026年2月調査）。自動検査で検出できるのはアクセシビリティ上の問題の一部であり、ツールの導入だけでWCAGへの適合を保証するものではありません。</p>
+        <p class="evidence-note">日本企業：総務省「令和7年通信利用動向調査」（ホームページ開設企業2,354社、2025年調査）。利用者：Intopia Assistive Technology Survey 2025（豪州・ニュージーランドの218人）。回答者構成は人口構成や日本国内の比率を示すものではありません。NANAiROの表示サポートは利用者の選択肢を増やす補助ツールであり、サイト自体の設計・実装・検証と組み合わせてご利用ください。</p>
       </section>
 
       <section id="download" class="section download-section" aria-labelledby="download-title">
