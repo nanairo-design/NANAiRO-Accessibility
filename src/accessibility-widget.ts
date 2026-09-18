@@ -490,12 +490,13 @@ export class NanairoAccessibility extends LitElement {
 
     .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 24px 20px; border-bottom: 1px solid var(--line); }
     .brand { min-width: 0; display: flex; align-items: center; gap: 12px; }
+    .brand > span:last-child { min-width: 0; }
     .brand-mark, .feature-icon { display: grid; place-items: center; flex: none; }
     .brand-mark { width: 44px; height: 44px; padding: 5px; }
     .brand-mark img { display: block; width: 100%; height: 100%; object-fit: contain; }
     .brand strong, .brand small { display: block; }
     .brand strong { font-size: 18px; line-height: 1.25; letter-spacing: -.02em; }
-    .brand small { margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 1.4; white-space: nowrap; }
+    .brand small { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
 
     .icon-button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; flex: none; cursor: pointer; color: var(--ink); border: 1px solid var(--line); border-radius: 50%; background: #fff; }
     .icon-button:hover { background: var(--soft); border-color: var(--accent); }
@@ -586,7 +587,7 @@ export class NanairoAccessibility extends LitElement {
       :host([position="left"]) .launcher[aria-expanded="true"] { right: auto; left: var(--drawer-width); border-radius: 0 12px 12px 0; }
       .panel { border-radius: 24px 0 0 24px; }
       :host([position="left"]) .panel { border-radius: 0 24px 24px 0; }
-      .brand small { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+      .color-heading { flex-wrap: wrap; gap: 4px 12px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
