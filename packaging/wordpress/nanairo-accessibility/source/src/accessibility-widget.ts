@@ -578,18 +578,22 @@ export class NanairoAccessibility extends LitElement {
     }
 
     @media (max-width: 520px) {
-      :host { --drawer-width: calc(100vw - 42px); }
+      :host { --drawer-width: 100vw; }
       .launcher { width: 108px; min-height: 51px; gap: 8px; padding: 7px 10px 7px 8px; border-radius: 10px 0 0 10px; }
       :host([position="left"]) .launcher { border-radius: 0 11px 11px 0; }
       .launcher:hover { width: 114px; }
       .launcher-mark { width: 32px; height: 32px; }
       .launcher-mark svg { width: 20px; height: 20px; }
       .launcher-label { font-size: 9px; }
-      .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 42px; min-height: 58px; border-radius: 11px 0 0 11px; }
-      .launcher[aria-expanded="true"]:hover { width: 42px; }
-      :host([position="left"]) .launcher[aria-expanded="true"] { right: auto; left: var(--drawer-width); border-radius: 0 12px 12px 0; }
-      .panel { border-radius: 24px 0 0 24px; }
-      :host([position="left"]) .panel { border-radius: 0 24px 24px 0; }
+      .launcher[aria-expanded="true"] { display: none; }
+      .panel,
+      :host([position="left"]) .panel {
+        width: 100vw;
+        max-width: 100vw;
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
+      }
       .color-heading { flex-wrap: wrap; gap: 4px 12px; }
     }
 
