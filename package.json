@@ -26,7 +26,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "node tests/e2e/widget.mjs"
+    "test:e2e": "node tests/e2e/widget.mjs && node tests/e2e/audit.mjs"
   },
   "dependencies": {
     "lit": "^3.3.1"

@@ -282,6 +282,42 @@ function setMediaControl(active: boolean): void {
   mediaStates.clear();
 }
 
+/** The `data-nanairo-*` attributes on `<html>` that drive every page override. */
+const EFFECT_DATA_KEYS = [
+  'nanairoTextScale',
+  'nanairoSpacing',
+  'nanairoLinks',
+  'nanairoColor',
+  'nanairoContrast',
+  'nanairoFont',
+  'nanairoMotion',
+] as const;
+
+/**
+ * Runs `measure` with this widget's own page overrides switched off.
+ *
+ * Anything that inspects the page — the audit in particular — has to see the
+ * site's real colours and sizes. Measuring while a colour mode is active
+ * reports the values this widget just forced, so a high-contrast run would
+ * find no contrast problem on any page at all.
+ */
+export function withPageEffectsSuspended<T>(measure: () => T): T {
+  const root = document.documentElement;
+  const saved = EFFECT_DATA_KEYS.map((key) => [key, root.dataset[key]] as const);
+
+  for (const [key] of saved) delete root.dataset[key];
+  try {
+    // Style resolution is synchronous on query, so getComputedStyle inside
+    // `measure` already reflects the suspension.
+    return measure();
+  } finally {
+    for (const [key, value] of saved) {
+      if (value === undefined) delete root.dataset[key];
+      else root.dataset[key] = value;
+    }
+  }
+}
+
 export function applyPageEffects(preferences: Preferences): void {
   if (!document.body) return;
   ensureStyles();

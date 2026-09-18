@@ -80,6 +80,9 @@ function syncPluginSources() {
     cpSync(at('src', name), join(target, name));
   }
   cpSync(at('src/assets'), join(target, 'assets'), { recursive: true });
+  // The build config decides the bundle bytes, so the shipped source needs the
+  // same one to be able to reproduce them.
+  cpSync(at('vite.config.ts'), join(WORDPRESS_PLUGIN, 'source/vite.config.ts'));
   console.log(`sources  -> ${sources.length} files mirrored into the plugin (${sources.join(', ')})`);
 }
 
