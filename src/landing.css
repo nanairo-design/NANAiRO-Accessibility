@@ -77,8 +77,8 @@ h1 span { color: var(--teal); }
 .mission-statement blockquote { margin: 30px 0 22px; font-size: clamp(27px, 3.2vw, 40px); font-weight: 700; line-height: 1.7; letter-spacing: -.04em; }
 .mission-statement p, .mission-copy > p { color: var(--muted); font-size: 14px; line-height: 2; }
 .mission-copy > .eyebrow { margin-bottom: 14px; }
-.meaning-list { list-style: none; margin: 24px 0 0; padding: 0; }
-.meaning-list li { display: grid; grid-template-columns: 32px 1fr; gap: 14px; padding: 19px 0; border-top: 1px solid var(--line); }
+.meaning-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; list-style: none; margin: 44px 0 0; padding: 0; }
+.meaning-list li { display: grid; grid-template-columns: 32px 1fr; align-content: start; gap: 14px; padding: 24px 0; border-top: 1px solid var(--line); }
 .meaning-list b { color: var(--teal); font-size: 12px; }
 .meaning-list strong { font-size: 14px; }
 .meaning-list p { margin: 5px 0 0; font-size: 12px; color: var(--muted); line-height: 1.8; }
@@ -184,7 +184,7 @@ body > footer { display: flex; align-items: center; justify-content: space-betwe
   .section { padding-block: 48px; }
   .section-intro { margin-bottom: 28px; }
   .section-intro p { font-size: 14px; }
-  .mission-grid, .research-grid, .download-grid, .cards, .install-notes { grid-template-columns: 1fr; }
+  .mission-grid, .meaning-list, .research-grid, .download-grid, .cards, .install-notes { grid-template-columns: 1fr; }
   .mission-statement { padding: 32px; }
   .evidence-section::before { inset-inline: -12px; border-radius: 28px; }
   .research-card { padding: 24px; }
