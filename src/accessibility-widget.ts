@@ -2,7 +2,7 @@ import { LitElement, css, html, nothing, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { messages, type Locale, type MessageKey } from './i18n';
 import { applyPageEffects, destroyPageEffects } from './page-effects';
-import { defaultPreferences, loadPreferences, savePreferences, type Preferences } from './state';
+import { defaultPreferences, loadPreferences, savePreferences, type ColorMode, type Preferences } from './state';
 import logoMarkUrl from './assets/nanairo-logo-mark.png?inline';
 import logoHorizontalUrl from './assets/nanairo-logo-horizontal.png?inline';
 
@@ -120,8 +120,16 @@ export class NanairoAccessibility extends LitElement {
     this.commit({ ...this.preferences, textScale });
   }
 
-  private toggle(key: keyof Pick<Preferences, 'comfortableSpacing' | 'highlightLinks' | 'highContrast' | 'readableFont' | 'reduceMotion' | 'readingGuide' | 'readingMask' | 'mediaPaused'>): void {
+  private toggle(key: keyof Pick<Preferences, 'comfortableSpacing' | 'highlightLinks' | 'readableFont' | 'reduceMotion' | 'readingGuide' | 'readingMask' | 'mediaPaused'>): void {
     this.commit({ ...this.preferences, [key]: !this.preferences[key] });
+  }
+
+  private setColorMode(colorMode: ColorMode): void {
+    this.commit({
+      ...this.preferences,
+      colorMode,
+      highContrast: colorMode === 'high-contrast',
+    });
   }
 
   private pageSpeechSegments(): string[] {
@@ -202,7 +210,7 @@ export class NanairoAccessibility extends LitElement {
   }
 
   private renderToggle(
-    key: 'comfortableSpacing' | 'highlightLinks' | 'highContrast' | 'readableFont' | 'reduceMotion' | 'readingGuide' | 'readingMask' | 'mediaPaused',
+    key: 'comfortableSpacing' | 'highlightLinks' | 'readableFont' | 'reduceMotion' | 'readingGuide' | 'readingMask' | 'mediaPaused',
     iconName: 'spacing' | 'link' | 'contrast' | 'font' | 'motion' | 'guide' | 'mask' | 'media',
     labelKey: MessageKey,
     hintKey: MessageKey,
@@ -227,6 +235,14 @@ export class NanairoAccessibility extends LitElement {
 
   render() {
     const scalePercent = [100, 112, 125, 150, 175][this.preferences.textScale];
+    const colorModes = [
+      { value: 'default', label: 'colorDefault' },
+      { value: 'dark', label: 'colorDark' },
+      { value: 'light', label: 'colorLight' },
+      { value: 'high-contrast', label: 'colorHighContrast' },
+      { value: 'monochrome', label: 'colorMonochrome' },
+      { value: 'saturated', label: 'colorSaturated' },
+    ] as const;
 
     return html`
       <button
@@ -298,9 +314,27 @@ export class NanairoAccessibility extends LitElement {
             <div class="preference-group">
               ${this.renderToggle('comfortableSpacing', 'spacing', 'spacing', 'spacingHint')}
               ${this.renderToggle('highlightLinks', 'link', 'highlightLinks', 'highlightLinksHint')}
-              ${this.renderToggle('highContrast', 'contrast', 'highContrast', 'highContrastHint')}
               ${this.renderToggle('readableFont', 'font', 'readableFont', 'readableFontHint')}
               ${this.renderToggle('reduceMotion', 'motion', 'reduceMotion', 'reduceMotionHint')}
+            </div>
+
+            <div class="color-heading">
+              <span>${this.t('colorModes')}</span>
+              <small>${this.t('colorModeHint')}</small>
+            </div>
+            <div class="color-mode-grid" role="radiogroup" aria-label=${this.t('colorModes')}>
+              ${colorModes.map(({ value, label }) => html`
+                <button
+                  class="color-mode ${this.preferences.colorMode === value ? 'active' : ''}"
+                  type="button"
+                  role="radio"
+                  aria-checked=${this.preferences.colorMode === value}
+                  @click=${() => this.setColorMode(value)}
+                >
+                  <span class="color-swatch swatch-${value}" aria-hidden="true"><span></span></span>
+                  <span>${this.t(label)}</span>
+                </button>
+              `)}
             </div>
 
             <div class="section-heading">${this.t('focus')}</div>
@@ -515,6 +549,22 @@ export class NanairoAccessibility extends LitElement {
     .switch span { display: block; width: 19px; height: 19px; border-radius: 50%; background: white; box-shadow: 0 2px 5px rgba(31,43,69,.22); transition: transform .28s cubic-bezier(.2,.8,.2,1); }
     .preference-row.active .switch { background: linear-gradient(90deg, #84c252, #39ae75 48%, #248d91); }
     .preference-row.active .switch span { transform: translateX(18px); }
+
+    .color-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 4px 8px; color: #727d90; font-size: 11px; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
+    .color-heading small { font-size: 9px; font-weight: 550; letter-spacing: 0; text-transform: none; }
+    .color-mode-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-bottom: 18px; }
+    .color-mode { min-width: 0; min-height: 58px; display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 7px; padding: 8px; cursor: pointer; color: #485468; border: 1px solid rgba(69,104,100,.13); border-radius: 15px; background: rgba(255,255,255,.52); font-size: 10px; font-weight: 700; line-height: 1.2; text-align: left; transition: border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease; }
+    .color-mode:hover { transform: translateY(-1px); border-color: rgba(31,145,137,.3); background: rgba(255,255,255,.8); }
+    .color-mode.active { color: #155f5e; border-color: rgba(31,145,137,.48); background: rgba(224,246,237,.92); box-shadow: inset 0 0 0 1px rgba(35,143,137,.12), 0 6px 16px rgba(32,117,108,.1); }
+    .color-swatch { width: 22px; height: 22px; display: block; padding: 3px; border: 1px solid rgba(38,53,51,.17); border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(31,43,69,.1); }
+    .color-swatch span { display: block; width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #9dcc47, #21aaa0); }
+    .swatch-dark { background: #181b1a; border-color: #181b1a; }
+    .swatch-dark span { background: #a2e6cc; }
+    .swatch-light span { background: #fff; border: 1px solid #737a78; }
+    .swatch-high-contrast { background: #000; border-color: #000; }
+    .swatch-high-contrast span { background: linear-gradient(90deg, #fff 50%, #000 50%); border: 1px solid #fff; }
+    .swatch-monochrome span { background: linear-gradient(135deg, #111, #b7b7b7); }
+    .swatch-saturated span { background: conic-gradient(#ff365f, #ffd600, #13bd68, #1c91ff, #9f45ff, #ff365f); }
 
     .note { margin: 2px 6px 6px; color: #7b8596; font-size: 10px; line-height: 1.55; }
     .panel-footer { display: flex; align-items: center; justify-content: space-between; padding: 13px 17px 15px; border-top: 1px solid rgba(99,116,148,.13); background: rgba(249,251,255,.32); }

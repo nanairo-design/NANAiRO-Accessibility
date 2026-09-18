@@ -25,6 +25,63 @@ html[data-nanairo-links="highlight"] body a:not([data-nanairo-ignore]) {
   border-radius: 0.18em;
 }
 
+html[data-nanairo-color="dark"] body {
+  color: #f7fbf9 !important;
+  background: #181b1a !important;
+  color-scheme: dark;
+}
+
+html[data-nanairo-color="dark"] body :where(main, section, article, aside, header, footer, nav, div, ul, ol, li, table, thead, tbody, tr, td, th, form) {
+  color: #f7fbf9 !important;
+  background-color: #181b1a !important;
+  background-image: none !important;
+  border-color: #59645f !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+html[data-nanairo-color="dark"] body :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, blockquote, figcaption, label, span, strong, small) {
+  color: #f7fbf9 !important;
+  background-color: transparent !important;
+  text-shadow: none !important;
+}
+
+html[data-nanairo-color="dark"] body :where(input, select, textarea, button) {
+  color: #fff !important;
+  background-color: #252a28 !important;
+  border-color: #76827d !important;
+}
+
+html[data-nanairo-color="dark"] body a:not([data-nanairo-ignore]) {
+  color: #a2e6cc !important;
+  text-decoration-color: currentColor !important;
+}
+
+html[data-nanairo-color="light"] body,
+html[data-nanairo-color="light"] body :where(main, section, article, aside, header, footer, nav, div, ul, ol, li, table, thead, tbody, tr, td, th, form) {
+  color: #27272d !important;
+  background-color: #fff !important;
+  background-image: none !important;
+  border-color: #b7bfbc !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  color-scheme: light;
+}
+
+html[data-nanairo-color="light"] body :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, blockquote, figcaption, label, span, strong, small, a) {
+  color: #27272d !important;
+  background-color: transparent !important;
+  text-shadow: none !important;
+}
+
+html[data-nanairo-color="monochrome"] body > :not(nanairo-accessibility) {
+  filter: grayscale(100%) !important;
+}
+
+html[data-nanairo-color="saturated"] body > :not(nanairo-accessibility) {
+  filter: saturate(180%) contrast(105%) !important;
+}
+
 html[data-nanairo-contrast="high"] body,
 html[data-nanairo-contrast="high"] body :where(main, section, article, aside, header, footer, nav) {
   color: #000 !important;
@@ -183,7 +240,11 @@ export function applyPageEffects(preferences: Preferences): void {
   root.dataset.nanairoTextScale = String(preferences.textScale);
   root.dataset.nanairoSpacing = preferences.comfortableSpacing ? 'comfortable' : 'default';
   root.dataset.nanairoLinks = preferences.highlightLinks ? 'highlight' : 'default';
-  root.dataset.nanairoContrast = preferences.highContrast ? 'high' : 'default';
+  const colorMode = preferences.colorMode === 'default' && preferences.highContrast
+    ? 'high-contrast'
+    : preferences.colorMode;
+  root.dataset.nanairoColor = colorMode;
+  root.dataset.nanairoContrast = colorMode === 'high-contrast' ? 'high' : 'default';
   root.dataset.nanairoFont = preferences.readableFont ? 'readable' : 'default';
   root.dataset.nanairoMotion = preferences.reduceMotion ? 'reduce' : 'default';
   setMediaControl(preferences.mediaPaused);
@@ -208,6 +269,7 @@ export function destroyPageEffects(): void {
   delete root.dataset.nanairoTextScale;
   delete root.dataset.nanairoSpacing;
   delete root.dataset.nanairoLinks;
+  delete root.dataset.nanairoColor;
   delete root.dataset.nanairoContrast;
   delete root.dataset.nanairoFont;
   delete root.dataset.nanairoMotion;

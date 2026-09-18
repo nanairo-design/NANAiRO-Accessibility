@@ -14,7 +14,7 @@ Add a display support widget that lets visitors adjust text, contrast, reading a
 
 NANAiRO Accessibility adds a fixed display support button to the public side of a WordPress website.
 
-Visitors can choose the presentation that is easier for them to use. Available controls include text size, spacing, link highlighting, high contrast, a readable font, reduced motion, reading guides, text-to-speech, and media pause or mute.
+Visitors can choose the presentation that is easier for them to use. Available controls include text size, spacing, link highlighting, dark, light, high-contrast, monochrome and vivid color modes, a readable font, reduced motion, reading guides, text-to-speech, and media pause or mute.
 
 The widget supports Japanese and English. Preferences are stored only in the visitor's browser. The plugin does not send browsing data or personal information to an external service.
 
