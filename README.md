@@ -60,6 +60,12 @@ init({
 ></script>
 ```
 
+### WordPress版
+
+`public/downloads/nanairo-accessibility-wordpress-0.1.0.zip`を解凍せず、WordPress管理画面の「プラグイン → 新規プラグインを追加 → プラグインのアップロード」からインストールします。
+
+有効化後は「設定 → NANAiRO Accessibility」で、表示の有効／無効、初期言語、ボタン位置を変更できます。HTMLやテーマファイルの編集は不要です。
+
 ## JavaScript API
 
 ```ts
@@ -89,6 +95,7 @@ npm run build
 
 - npm版：`public/downloads/nanairo-accessibility-0.1.0.tgz`
 - CDN／セルフホスト版：`public/downloads/nanairo-accessibility-cdn-0.1.0.zip`
+- WordPress版：`public/downloads/nanairo-accessibility-wordpress-0.1.0.zip`
 
 ## 注意事項
 

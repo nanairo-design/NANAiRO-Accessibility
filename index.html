@@ -101,11 +101,12 @@
       .meaning-list strong { display: block; margin-bottom: 5px; color: #1c2940; font-size: 15px; }
       .meaning-list p { margin: 0; color: #69758a; font-size: 13px; line-height: 1.65; }
       .download-section { width: min(1180px, calc(100% - 40px)); }
-      .download-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+      .download-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
       .download-card { position: relative; min-height: 380px; display: flex; flex-direction: column; padding: 31px; overflow: hidden; border: 1px solid rgba(31,130,126,.1); border-radius: 31px; background: #fff; box-shadow: 0 22px 58px rgba(24,107,104,.09); }
       .download-card::after { content: ""; position: absolute; z-index: -1; width: 230px; height: 180px; right: -75px; top: -70px; border-radius: 50%; filter: blur(12px); opacity: .42; }
       .download-card.npm::after { background: #9dcc47; }
       .download-card.cdn::after { background: #20aaa0; }
+      .download-card.wordpress::after { background: #68b86f; }
       .package-type { color: #218783; font-size: 11px; font-weight: 800; letter-spacing: .11em; }
       .download-card h3 { margin: 19px 0 10px; font-size: 29px; letter-spacing: -.035em; }
       .download-card p { margin: 0; color: #667388; line-height: 1.75; }
@@ -116,6 +117,7 @@
       .download-button { min-height: 50px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; margin-top: auto; padding: 0 18px; color: white; border: 1px solid rgba(255,255,255,.3); border-radius: 15px; background: linear-gradient(135deg, #3c873f, #16806b 52%, #17666b); box-shadow: inset 0 1px rgba(255,255,255,.28), 0 12px 27px rgba(27,125,121,.22); font-size: 14px; font-weight: 750; text-decoration: none; }
       .download-button:hover { transform: translateY(-2px); }
       .download-button svg { width: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+      .wordpress-link { display: inline-flex; align-items: center; justify-content: center; margin-top: 12px; color: #267d78; font-size: 12px; font-weight: 750; text-underline-offset: 3px; }
 
       .install-grid { display: grid; gap: 24px; }
       .install-card { padding: 30px; border: 1px solid rgba(31,130,126,.1); border-radius: 27px; background: #fff; box-shadow: 0 16px 45px rgba(24,107,104,.08); }
@@ -239,8 +241,8 @@
       <section id="download" class="section download-section" aria-labelledby="download-title">
         <div class="section-intro">
           <span class="eyebrow">DOWNLOAD</span>
-          <h2 id="download-title">サイトに合わせて、2つの導入方法。</h2>
-          <p>難しい名前に見えますが、違いは「サイトをどのように管理しているか」だけです。制作会社や開発者が管理するサイトはnpm版、自分でHTMLやWordPressのテンプレートを編集できるサイトはCDN／セルフホスト版を選びます。</p>
+          <h2 id="download-title">サイトに合わせて、3つの導入方法。</h2>
+          <p>難しい名前に見えますが、違いは「サイトをどのように管理しているか」だけです。WordPressをご利用なら専用プラグイン版、制作会社や開発者が管理するサイトはnpm版、HTMLを直接編集できるサイトはCDN／セルフホスト版を選びます。</p>
         </div>
         <div class="download-grid">
           <article class="download-card npm">
@@ -258,12 +260,24 @@
             <span class="package-type">NO BUILD TOOL REQUIRED</span>
             <h3>CDN埋め込み版</h3>
             <p>ダウンロードしたJavaScriptファイルをWebサーバーへ置き、HTMLへ短いコードを1つ貼り付ける方法です。新しい開発環境を用意する必要はありません。</p>
-            <p class="plain-guide"><strong>簡単にいうと</strong>HTMLやWordPressの共通テンプレートを編集できる場合はこちらです。ZIPにはファイル、貼り付け例、日本語の手順書が入っています。</p>
-            <div class="package-meta"><span>HTMLに貼り付け</span><span>ビルド不要</span><span>WordPress対応</span></div>
+            <p class="plain-guide"><strong>簡単にいうと</strong>HTMLの共通部分を直接編集できる場合はこちらです。ZIPにはファイル、貼り付け例、日本語の手順書が入っています。</p>
+            <div class="package-meta"><span>HTMLに貼り付け</span><span>ビルド不要</span><span>セルフホスト</span></div>
             <a class="download-button" href="/downloads/nanairo-accessibility-cdn-0.1.0.zip" download>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 20h14"/></svg>
               CDN版をダウンロード
             </a>
+          </article>
+          <article class="download-card wordpress">
+            <span class="package-type">FOR WORDPRESS</span>
+            <h3>WordPress版</h3>
+            <p>WordPressの管理画面からZIPをアップロードして有効化するだけで、全ページへ表示サポートを追加できます。HTMLやテーマファイルを直接編集する必要はありません。</p>
+            <p class="plain-guide"><strong>簡単にいうと</strong>WordPressをご利用の場合はこちらです。設定画面から表示言語とボタンの左右位置を選べます。</p>
+            <div class="package-meta"><span>管理画面で導入</span><span>コード編集不要</span><span>設定画面付き</span></div>
+            <a class="download-button" href="/downloads/nanairo-accessibility-wordpress-0.1.0.zip" download>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 20h14"/></svg>
+              WordPress版をダウンロード
+            </a>
+            <a class="wordpress-link" href="https://wordpress.org/plugins/" target="_blank" rel="noopener noreferrer">WordPress公式プラグインディレクトリ ↗</a>
           </article>
         </div>
       </section>
@@ -272,7 +286,7 @@
         <div class="section-intro">
           <span class="eyebrow">INSTALLATION</span>
           <h2 id="install-title">貼り付け方。</h2>
-          <p>まず、サイトを作った担当者へ管理方法を確認してください。「ReactやVueを使っている」と言われたらnpm版、「HTMLまたはWordPressを直接編集できる」と言われたらCDN版です。</p>
+          <p>WordPressなら専用プラグイン版を選べます。「ReactやVueを使っている」と言われたらnpm版、通常のHTMLを直接編集できる場合はCDN版です。</p>
         </div>
         <div class="install-grid">
           <article class="install-card">
@@ -291,7 +305,7 @@ init({
             <div class="install-notes"><p><strong>1. 担当者へ渡す</strong>ダウンロードした.tgzファイルを、サイトを管理する制作会社や開発者へ渡します。</p><p><strong>2. 組み込んでもらう</strong>担当者が上記のコマンドを実行し、サイトのプログラムへ追加します。</p><p><strong>3. 全ページで確認</strong>右端に「表示サポート」が表示され、各機能が動くことを確認します。</p></div>
           </article>
           <article class="install-card">
-            <header><div><h3>CDN／セルフホスト版</h3><p>HTMLやWordPressの共通部分を編集できる方向け</p></div><span class="step-badge">02</span></header>
+            <header><div><h3>CDN／セルフホスト版</h3><p>HTMLの共通部分を編集できる方向け</p></div><span class="step-badge">02</span></header>
             <div class="code-wrap">
               <button class="copy-button" type="button" data-copy="cdn-code">コピー</button>
               <pre id="cdn-code"><code>&lt;script
@@ -303,6 +317,12 @@ init({
 &gt;&lt;/script&gt;</code></pre>
             </div>
             <div class="install-notes"><p><strong>1. ZIPを開く</strong>中にあるJavaScriptファイルを、画像などを置くサイトのフォルダへアップロードします。</p><p><strong>2. コードを貼る</strong>全ページで共通するHTMLの&lt;/body&gt;直前へ、上のコードをコピーして貼ります。</p><p><strong>3. 表示を確認</strong>srcをアップロード先のURLへ合わせ、右端に「表示サポート」が出れば完了です。</p></div>
+          </article>
+          <article class="install-card">
+            <header><div><h3>WordPress版</h3><p>管理画面だけで導入したい方向け</p></div><span class="step-badge">03</span></header>
+            <div class="code-wrap"><pre><code>管理画面 → プラグイン → 新規プラグインを追加
+→ プラグインのアップロード → ZIPを選択</code></pre></div>
+            <div class="install-notes"><p><strong>1. ZIPを選ぶ</strong>WordPress版のZIPを解凍せず、そのまま管理画面からアップロードします。</p><p><strong>2. 有効化する</strong>「今すぐインストール」の後に「プラグインを有効化」を押します。</p><p><strong>3. 表示を設定</strong>「設定 → NANAiRO Accessibility」で、日本語／英語とボタン位置を選びます。</p></div>
           </article>
         </div>
       </section>
