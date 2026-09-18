@@ -240,7 +240,6 @@ export class NanairoAccessibility extends LitElement {
       >
         <span class="launcher-mark" aria-hidden="true">${icon('accessibility')}</span>
         <span class="launcher-label" aria-hidden="true"><span>表示</span><span>サポート</span></span>
-        <span class="launcher-cue" aria-hidden="true"><span class="cue-arrow">‹</span>開く</span>
       </button>
 
       ${this.open ? html`
@@ -359,7 +358,7 @@ export class NanairoAccessibility extends LitElement {
       z-index: 2147483646;
       right: 0;
       top: 50%;
-      margin-top: -64px;
+      margin-top: -41px;
       color: var(--ink);
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -377,23 +376,21 @@ export class NanairoAccessibility extends LitElement {
     .launcher {
       position: relative;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      width: 62px;
-      min-height: 148px;
-      padding: 13px 8px 11px;
+      gap: 14px;
+      width: 174px;
+      min-height: 82px;
+      padding: 14px 20px 14px 16px;
       margin-left: auto;
       overflow: hidden;
       cursor: pointer;
       color: white;
       border: 1px solid rgba(255,255,255,.64);
       border-right: 0;
-      border-radius: 24px 0 0 24px;
-      background:
-        radial-gradient(circle at 24% 8%, rgba(255,255,255,.3), transparent 36%),
-        linear-gradient(155deg, #78bb67, #35ab74 48%, #218e90);
+      border-radius: 13px 0 0 13px;
+      background: linear-gradient(135deg, #62b66b, #24a47d 52%, #218e90);
       box-shadow:
         inset 0 1px 1px rgba(255,255,255,.56),
         inset 0 -10px 22px rgba(20,97,96,.12),
@@ -405,22 +402,18 @@ export class NanairoAccessibility extends LitElement {
       animation: launcher-invite 1.8s ease-out 1s 2;
     }
 
-    :host([position="left"]) .launcher { margin-right: auto; margin-left: 0; border-right: 1px solid rgba(255,255,255,.64); border-left: 0; border-radius: 0 24px 24px 0; box-shadow: inset 0 1px 1px rgba(255,255,255,.56), inset 0 -10px 22px rgba(20,97,96,.12), 10px 14px 36px rgba(27,107,106,.2), 2px 2px 8px rgba(27,107,106,.12); }
+    :host([position="left"]) .launcher { margin-right: auto; margin-left: 0; border-right: 1px solid rgba(255,255,255,.64); border-left: 0; border-radius: 0 13px 13px 0; box-shadow: inset 0 1px 1px rgba(255,255,255,.56), inset 0 -10px 22px rgba(20,97,96,.12), 10px 14px 36px rgba(27,107,106,.2), 2px 2px 8px rgba(27,107,106,.12); }
     :host([position="left"]) .launcher { animation-name: launcher-invite-left; }
-    .launcher:hover { width: 70px; filter: brightness(1.05); box-shadow: inset 0 1px 1px rgba(255,255,255,.7), inset 0 -10px 22px rgba(20,97,96,.1), -15px 18px 42px rgba(27,107,106,.28), -3px 3px 10px rgba(27,107,106,.16); }
+    .launcher:hover { width: 184px; filter: brightness(1.05); box-shadow: inset 0 1px 1px rgba(255,255,255,.7), inset 0 -10px 22px rgba(20,97,96,.1), -15px 18px 42px rgba(27,107,106,.28), -3px 3px 10px rgba(27,107,106,.16); }
     .launcher:active { transform: scale(.97); }
     .launcher:focus-visible, button:focus-visible, select:focus-visible { outline: 3px solid #237f82; outline-offset: 3px; }
-    .launcher-mark { position: relative; display: grid; place-items: center; }
-    .launcher-mark svg { width: 39px; height: 39px; stroke-width: 1.65; filter: drop-shadow(0 2px 4px rgba(17,81,78,.22)); }
-    .launcher-label { display: grid; justify-items: center; gap: 2px; font-size: 10px; font-weight: 760; letter-spacing: .04em; line-height: 1.12; text-align: center; writing-mode: horizontal-tb; }
-    .launcher-cue { min-width: 43px; min-height: 23px; display: inline-flex; align-items: center; justify-content: center; gap: 2px; padding: 3px 6px; color: #166f6d; border: 1px solid rgba(255,255,255,.75); border-radius: 999px; background: rgba(255,255,255,.9); box-shadow: 0 4px 10px rgba(16,91,87,.18), inset 0 1px rgba(255,255,255,.9); font-size: 10px; font-weight: 800; line-height: 1; transition: transform .25s ease, background .25s ease; }
-    .cue-arrow { margin-top: -1px; font-size: 16px; line-height: .7; }
-    :host([position="left"]) .cue-arrow { transform: scaleX(-1); }
-    .launcher:hover .launcher-cue { transform: translateX(-3px); background: #fff; }
+    .launcher-mark { position: relative; width: 52px; height: 52px; display: grid; place-items: center; flex: none; color: #23977f; border-radius: 50%; background: #fff; box-shadow: 0 7px 16px rgba(16,91,87,.2), inset 0 0 0 1px rgba(255,255,255,.8); }
+    .launcher-mark svg { width: 33px; height: 33px; stroke-width: 1.8; }
+    .launcher-label { display: grid; justify-items: start; gap: 2px; font-size: 14px; font-weight: 800; letter-spacing: .06em; line-height: 1.08; text-align: left; writing-mode: horizontal-tb; }
 
     .panel {
       position: absolute;
-      right: 76px;
+      right: 190px;
       top: 50%;
       width: min(390px, calc(100vw - 96px));
       max-height: min(720px, calc(100dvh - 28px));
@@ -442,7 +435,7 @@ export class NanairoAccessibility extends LitElement {
       animation: materialize .34s cubic-bezier(.2,.85,.22,1) both;
     }
 
-    :host([position="left"]) .panel { right: auto; left: 76px; transform-origin: center left; }
+    :host([position="left"]) .panel { right: auto; left: 190px; transform-origin: center left; }
     .panel::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit; background: linear-gradient(120deg, rgba(255,255,255,.55), transparent 28%, transparent 68%, rgba(34,170,158,.13)); }
     .glass-light { position: absolute; z-index: -1; pointer-events: none; border-radius: 50%; filter: blur(30px); opacity: .42; }
     .glass-light-one { width: 190px; height: 130px; top: -70px; left: -30px; background: #9dcc47; }
@@ -522,13 +515,15 @@ export class NanairoAccessibility extends LitElement {
     }
 
     @media (max-width: 520px) {
-      :host { margin-top: -58px; }
-      .launcher { width: 58px; min-height: 138px; border-radius: 21px 0 0 21px; }
-      :host([position="left"]) .launcher { border-radius: 0 21px 21px 0; }
-      .launcher:hover { width: 62px; }
-      .launcher-mark svg { width: 35px; height: 35px; }
-      .panel { position: fixed; inset: max(10px, env(safe-area-inset-top)) 66px max(10px, env(safe-area-inset-bottom)) 10px; width: auto; max-height: none; border-radius: 27px; transform-origin: center right; animation-name: materialize-mobile; }
-      :host([position="left"]) .panel { inset: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)) 66px; transform-origin: center left; }
+      :host { margin-top: -36px; }
+      .launcher { width: 154px; min-height: 72px; gap: 11px; padding: 11px 15px 11px 12px; border-radius: 11px 0 0 11px; }
+      :host([position="left"]) .launcher { border-radius: 0 11px 11px 0; }
+      .launcher:hover { width: 160px; }
+      .launcher-mark { width: 46px; height: 46px; }
+      .launcher-mark svg { width: 29px; height: 29px; }
+      .launcher-label { font-size: 12px; }
+      .panel { position: fixed; inset: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)) 10px; width: auto; max-height: none; border-radius: 27px; transform-origin: center right; animation-name: materialize-mobile; }
+      :host([position="left"]) .panel { inset: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)) 10px; transform-origin: center left; }
       .brand small { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
     }
 
