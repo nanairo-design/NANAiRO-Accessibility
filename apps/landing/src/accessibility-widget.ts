@@ -233,12 +233,14 @@ export class NanairoAccessibility extends LitElement {
         class="launcher"
         type="button"
         aria-label=${this.t('open')}
+        title=${this.t('open')}
         aria-expanded=${this.open}
         aria-controls=${this.panelId}
         @click=${() => this.open ? this.closePanel(false) : this.openPanel()}
       >
         <span class="launcher-mark" aria-hidden="true">${icon('accessibility')}</span>
         <span class="launcher-label" aria-hidden="true"><span>表示</span><span>サポート</span></span>
+        <span class="launcher-cue" aria-hidden="true"><span class="cue-arrow">‹</span>開く</span>
       </button>
 
       ${this.open ? html`
@@ -380,7 +382,7 @@ export class NanairoAccessibility extends LitElement {
       justify-content: center;
       gap: 8px;
       width: 62px;
-      min-height: 128px;
+      min-height: 148px;
       padding: 13px 8px 11px;
       margin-left: auto;
       overflow: hidden;
@@ -399,16 +401,22 @@ export class NanairoAccessibility extends LitElement {
         -2px 2px 8px rgba(27,107,106,.12);
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
-      transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease;
+      transition: width .28s cubic-bezier(.2,.8,.2,1), transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, filter .28s ease;
+      animation: launcher-invite 1.8s ease-out 1s 2;
     }
 
     :host([position="left"]) .launcher { margin-right: auto; margin-left: 0; border-right: 1px solid rgba(255,255,255,.64); border-left: 0; border-radius: 0 24px 24px 0; box-shadow: inset 0 1px 1px rgba(255,255,255,.56), inset 0 -10px 22px rgba(20,97,96,.12), 10px 14px 36px rgba(27,107,106,.2), 2px 2px 8px rgba(27,107,106,.12); }
-    .launcher:hover { width: 66px; background: linear-gradient(155deg, #82c46f, #3cb47c 48%, #248f92); }
+    :host([position="left"]) .launcher { animation-name: launcher-invite-left; }
+    .launcher:hover { width: 70px; filter: brightness(1.05); box-shadow: inset 0 1px 1px rgba(255,255,255,.7), inset 0 -10px 22px rgba(20,97,96,.1), -15px 18px 42px rgba(27,107,106,.28), -3px 3px 10px rgba(27,107,106,.16); }
     .launcher:active { transform: scale(.97); }
     .launcher:focus-visible, button:focus-visible, select:focus-visible { outline: 3px solid #237f82; outline-offset: 3px; }
     .launcher-mark { position: relative; display: grid; place-items: center; }
     .launcher-mark svg { width: 39px; height: 39px; stroke-width: 1.65; filter: drop-shadow(0 2px 4px rgba(17,81,78,.22)); }
     .launcher-label { display: grid; justify-items: center; gap: 2px; font-size: 10px; font-weight: 760; letter-spacing: .04em; line-height: 1.12; text-align: center; writing-mode: horizontal-tb; }
+    .launcher-cue { min-width: 43px; min-height: 23px; display: inline-flex; align-items: center; justify-content: center; gap: 2px; padding: 3px 6px; color: #166f6d; border: 1px solid rgba(255,255,255,.75); border-radius: 999px; background: rgba(255,255,255,.9); box-shadow: 0 4px 10px rgba(16,91,87,.18), inset 0 1px rgba(255,255,255,.9); font-size: 10px; font-weight: 800; line-height: 1; transition: transform .25s ease, background .25s ease; }
+    .cue-arrow { margin-top: -1px; font-size: 16px; line-height: .7; }
+    :host([position="left"]) .cue-arrow { transform: scaleX(-1); }
+    .launcher:hover .launcher-cue { transform: translateX(-3px); background: #fff; }
 
     .panel {
       position: absolute;
@@ -503,11 +511,21 @@ export class NanairoAccessibility extends LitElement {
       to { opacity: 1; transform: translateY(-50%) scale(1); filter: blur(0); }
     }
 
+    @keyframes launcher-invite {
+      0%, 100% { transform: translateX(0); }
+      45% { transform: translateX(-5px); }
+    }
+
+    @keyframes launcher-invite-left {
+      0%, 100% { transform: translateX(0); }
+      45% { transform: translateX(5px); }
+    }
+
     @media (max-width: 520px) {
       :host { margin-top: -58px; }
-      .launcher { width: 56px; min-height: 116px; border-radius: 21px 0 0 21px; }
+      .launcher { width: 58px; min-height: 138px; border-radius: 21px 0 0 21px; }
       :host([position="left"]) .launcher { border-radius: 0 21px 21px 0; }
-      .launcher:hover { width: 58px; }
+      .launcher:hover { width: 62px; }
       .launcher-mark svg { width: 35px; height: 35px; }
       .panel { position: fixed; inset: max(10px, env(safe-area-inset-top)) 66px max(10px, env(safe-area-inset-bottom)) 10px; width: auto; max-height: none; border-radius: 27px; transform-origin: center right; animation-name: materialize-mobile; }
       :host([position="left"]) .panel { inset: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)) 66px; transform-origin: center left; }
