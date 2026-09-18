@@ -232,14 +232,17 @@ export class NanairoAccessibility extends LitElement {
       <button
         class="launcher"
         type="button"
-        aria-label=${this.t('open')}
-        title=${this.t('open')}
+        aria-label=${this.open ? this.t('close') : this.t('open')}
+        title=${this.open ? this.t('close') : this.t('open')}
         aria-expanded=${this.open}
         aria-controls=${this.panelId}
         @click=${() => this.open ? this.closePanel(false) : this.openPanel()}
       >
         <span class="launcher-mark" aria-hidden="true">${icon('accessibility')}</span>
         <span class="launcher-label" aria-hidden="true"><span>表示</span><span>サポート</span></span>
+        <span class="launcher-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"></path></svg>
+        </span>
       </button>
 
       ${this.open ? html`
@@ -354,6 +357,7 @@ export class NanairoAccessibility extends LitElement {
       --accent-soft: #49ad70;
       --ink: #183f3d;
       --muted: #5d706b;
+      --drawer-width: min(420px, calc(100vw - 64px));
       position: fixed;
       z-index: 2147483646;
       right: 0;
@@ -410,19 +414,31 @@ export class NanairoAccessibility extends LitElement {
     .launcher-mark { position: relative; width: 52px; height: 52px; display: grid; place-items: center; flex: none; color: #23977f; border-radius: 50%; background: #fff; box-shadow: 0 7px 16px rgba(16,91,87,.2), inset 0 0 0 1px rgba(255,255,255,.8); }
     .launcher-mark svg { width: 33px; height: 33px; stroke-width: 1.8; }
     .launcher-label { display: grid; justify-items: start; gap: 2px; font-size: 14px; font-weight: 800; letter-spacing: .06em; line-height: 1.08; text-align: left; writing-mode: horizontal-tb; }
+    .launcher-arrow { display: none; place-items: center; }
+    .launcher-arrow svg { width: 32px; height: 32px; stroke-width: 1.6; }
+    .launcher[aria-expanded="true"] { position: fixed; z-index: 2; right: var(--drawer-width); top: 50%; width: 64px; min-height: 84px; padding: 0; border-radius: 14px 0 0 14px; animation: none; transform: translateY(-50%); }
+    .launcher[aria-expanded="true"]:hover { width: 64px; }
+    .launcher[aria-expanded="true"]:active { transform: translateY(-50%) scale(.97); }
+    .launcher[aria-expanded="true"] .launcher-mark,
+    .launcher[aria-expanded="true"] .launcher-label { display: none; }
+    .launcher[aria-expanded="true"] .launcher-arrow { display: grid; }
+    :host([position="left"]) .launcher[aria-expanded="true"] { right: auto; left: var(--drawer-width); border-radius: 0 14px 14px 0; }
+    :host([position="left"]) .launcher[aria-expanded="true"] .launcher-arrow { transform: scaleX(-1); }
 
     .panel {
-      position: absolute;
-      right: 190px;
-      top: 50%;
-      width: min(390px, calc(100vw - 96px));
-      max-height: min(720px, calc(100dvh - 28px));
+      position: fixed;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--drawer-width);
+      height: 100dvh;
+      max-height: none;
       display: grid;
       grid-template-rows: auto minmax(0, 1fr) auto;
       overflow: hidden;
       isolation: isolate;
       border: 1px solid rgba(255,255,255,.78);
-      border-radius: 32px;
+      border-radius: 32px 0 0 32px;
       background: linear-gradient(145deg, rgba(255,255,255,.88), rgba(235,248,243,.76));
       box-shadow:
         inset 0 1px 1px rgba(255,255,255,.96),
@@ -432,10 +448,10 @@ export class NanairoAccessibility extends LitElement {
       backdrop-filter: blur(38px) saturate(175%);
       -webkit-backdrop-filter: blur(38px) saturate(175%);
       transform-origin: center right;
-      animation: materialize .34s cubic-bezier(.2,.85,.22,1) both;
+      animation: drawer-in .42s cubic-bezier(.2,.85,.22,1) both;
     }
 
-    :host([position="left"]) .panel { right: auto; left: 190px; transform-origin: center left; }
+    :host([position="left"]) .panel { right: auto; left: 0; border-radius: 0 32px 32px 0; transform-origin: center left; animation-name: drawer-in-left; }
     .panel::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit; background: linear-gradient(120deg, rgba(255,255,255,.55), transparent 28%, transparent 68%, rgba(34,170,158,.13)); }
     .glass-light { position: absolute; z-index: -1; pointer-events: none; border-radius: 50%; filter: blur(30px); opacity: .42; }
     .glass-light-one { width: 190px; height: 130px; top: -70px; left: -30px; background: #9dcc47; }
@@ -499,9 +515,14 @@ export class NanairoAccessibility extends LitElement {
     .footer-brand img { width: 84px; height: auto; object-fit: contain; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
-    @keyframes materialize {
-      from { opacity: 0; transform: translateY(calc(-50% + 12px)) scale(.94); filter: blur(6px); }
-      to { opacity: 1; transform: translateY(-50%) scale(1); filter: blur(0); }
+    @keyframes drawer-in {
+      from { opacity: .3; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes drawer-in-left {
+      from { opacity: .3; transform: translateX(-100%); }
+      to { opacity: 1; transform: translateX(0); }
     }
 
     @keyframes launcher-invite {
@@ -515,21 +536,19 @@ export class NanairoAccessibility extends LitElement {
     }
 
     @media (max-width: 520px) {
-      :host { margin-top: -36px; }
+      :host { --drawer-width: calc(100vw - 54px); margin-top: -36px; }
       .launcher { width: 154px; min-height: 72px; gap: 11px; padding: 11px 15px 11px 12px; border-radius: 11px 0 0 11px; }
       :host([position="left"]) .launcher { border-radius: 0 11px 11px 0; }
       .launcher:hover { width: 160px; }
       .launcher-mark { width: 46px; height: 46px; }
       .launcher-mark svg { width: 29px; height: 29px; }
       .launcher-label { font-size: 12px; }
-      .panel { position: fixed; inset: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)) 10px; width: auto; max-height: none; border-radius: 27px; transform-origin: center right; animation-name: materialize-mobile; }
-      :host([position="left"]) .panel { inset: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)) 10px; transform-origin: center left; }
+      .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 54px; min-height: 74px; border-radius: 12px 0 0 12px; }
+      .launcher[aria-expanded="true"]:hover { width: 54px; }
+      :host([position="left"]) .launcher[aria-expanded="true"] { right: auto; left: var(--drawer-width); border-radius: 0 12px 12px 0; }
+      .panel { border-radius: 24px 0 0 24px; }
+      :host([position="left"]) .panel { border-radius: 0 24px 24px 0; }
       .brand small { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
-    }
-
-    @keyframes materialize-mobile {
-      from { opacity: 0; transform: translateX(10px) scale(.96); filter: blur(5px); }
-      to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
     }
 
     @media (prefers-reduced-motion: reduce) {
