@@ -9,6 +9,7 @@ html[data-nanairo-text-scale="1"] { font-size: 112.5%; }
 html[data-nanairo-text-scale="2"] { font-size: 125%; }
 html[data-nanairo-text-scale="3"] { font-size: 150%; }
 html[data-nanairo-text-scale="4"] { font-size: 175%; }
+html[data-nanairo-text-scale="5"] { font-size: 200%; }
 
 html[data-nanairo-spacing="comfortable"] body :where(p, li, dd, dt, blockquote, figcaption, label, input, textarea, button) {
   line-height: 1.8 !important;
@@ -63,6 +64,8 @@ html[data-nanairo-color="dark"] body :where(mark) {
 
 html[data-nanairo-color="dark"] body a:not([data-nanairo-ignore]) {
   color: #a2e6cc !important;
+  background-color: #252a28 !important;
+  border-color: #76827d !important;
   text-decoration-color: currentColor !important;
 }
 

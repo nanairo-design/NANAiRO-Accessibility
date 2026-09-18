@@ -21,18 +21,13 @@ const WORDPRESS_PLUGIN = at('packaging/wordpress/nanairo-accessibility');
 const CDN_DIR = at('packaging/cdn');
 const DOWNLOADS = at('public/downloads');
 
-/** Sources mirrored into the plugin so it ships human-readable code. */
-const MIRRORED_SOURCES = [
-  'index.ts',
-  'i18n.ts',
-  'state.ts',
-  'speech.ts',
-  'page-effects.ts',
-  'accessibility-widget.ts',
-  'i18n.test.ts',
-  'state.test.ts',
-  'speech.test.ts',
-];
+/**
+ * Sources mirrored into the plugin so it ships human-readable code. Discovered
+ * rather than listed: a hard-coded list silently drops a newly added module,
+ * and the sync deletes the stale copies first, so the shipped source would no
+ * longer build.
+ */
+const mirroredSources = () => readdirSync(at('src')).filter((name) => name.endsWith('.ts')).sort();
 
 const kb = (bytes) => `${(bytes / 1024).toFixed(1)}KB`;
 
@@ -80,11 +75,12 @@ function syncPluginSources() {
   for (const name of readdirSync(target)) {
     if (name.endsWith('.ts')) rmSync(join(target, name));
   }
-  for (const name of MIRRORED_SOURCES) {
+  const sources = mirroredSources();
+  for (const name of sources) {
     cpSync(at('src', name), join(target, name));
   }
   cpSync(at('src/assets'), join(target, 'assets'), { recursive: true });
-  console.log(`sources  -> ${MIRRORED_SOURCES.length} files mirrored into the plugin`);
+  console.log(`sources  -> ${sources.length} files mirrored into the plugin (${sources.join(', ')})`);
 }
 
 function writeBundleCopies(bundle) {

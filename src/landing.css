@@ -95,6 +95,17 @@ h1 span { color: var(--teal); }
 .adoption-highlight strong { font-size: 62px; line-height: 1; letter-spacing: -.055em; }
 .adoption-highlight small { font-size: 20px; }
 .adoption-highlight span { font-size: 11px; line-height: 1.6; }
+.beneficiary-highlight { display: flex; align-items: center; gap: 18px; margin: 8px 0 24px; color: var(--teal); }
+.beneficiary-highlight strong { font-size: 54px; line-height: 1; letter-spacing: -.055em; }
+.beneficiary-highlight small { margin-left: 5px; font-size: 16px; letter-spacing: 0; }
+.beneficiary-highlight span { font-size: 11px; line-height: 1.6; }
+.research-context { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.9; }
+.context-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 8px 0 22px; }
+.context-metrics > div { min-width: 0; padding: 18px 14px; border: 1px solid var(--line); border-radius: 18px; background: var(--soft); }
+.context-metrics strong, .context-metrics span { display: block; }
+.context-metrics strong { color: var(--teal); font-size: 30px; line-height: 1.15; letter-spacing: -.045em; white-space: nowrap; }
+.context-metrics strong small { margin-left: 3px; font-size: 11px; letter-spacing: 0; }
+.context-metrics span { margin-top: 8px; color: var(--muted); font-size: 9px; line-height: 1.55; }
 .chart-block { margin: 0; }
 .chart-block figcaption { margin-bottom: 14px; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .05em; }
 .stacked-bar, .gender-bar { display: flex; width: 100%; height: 18px; overflow: hidden; border-radius: 999px; background: #e6ece9; }
@@ -110,6 +121,9 @@ h1 span { color: var(--teal); }
 .bar-chart li > i { height: 9px; overflow: hidden; border-radius: 999px; background: #e7ece9; }
 .bar-chart li > i b { display: block; width: min(calc(var(--value) * 2.5%), 100%); height: 100%; border-radius: inherit; background: linear-gradient(90deg, #397579, #76a98c); }
 .bar-chart li > strong { color: var(--teal); text-align: right; font-size: 10px; }
+.beneficiary-chart li { grid-template-columns: minmax(90px, 1fr) 1.6fr 68px; }
+.beneficiary-chart li > i b { width: min(calc(var(--value) * .633%), 100%); }
+.beneficiary-chart li > strong { white-space: nowrap; }
 .bar-chart-compact { gap: 7px; }
 .bar-chart-compact li > i b { width: min(calc(var(--value) * 4%), 100%); }
 .sub-caption { margin-top: 22px; }
@@ -158,6 +172,10 @@ code .accent { color: #a2d6bc; }
 .callout .primary { justify-self: center; min-height: 56px; padding-inline: 32px; }
 body > footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid var(--line); padding-block: 42px; font-size: 11px; color: var(--muted); }
 .footer-logo img { width: 140px; height: auto; display: block; }
+html[data-nanairo-color="dark"] :is(.logo, .mission-brand, .footer-logo) img,
+html[data-nanairo-color="dark"] .demo-icon {
+  filter: brightness(0) invert(1);
+}
 @media (max-width: 900px) {
   .site-header, .hero, .section, body > footer { width: calc(100% - 48px); }
   nav a { padding-inline: 12px; }

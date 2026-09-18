@@ -19,6 +19,9 @@ export interface Preferences {
 
 const STORAGE_KEY = 'nanairo:a11y:preferences:v1';
 
+/** Highest text-scale step; 5 renders the page at 200%, which WCAG 1.4.4 asks for. */
+export const MAX_TEXT_SCALE = 5;
+
 export const defaultPreferences = (locale: Locale = 'ja'): Preferences => ({
   schemaVersion: 1,
   locale,
@@ -53,7 +56,7 @@ const toTextScale = (value: unknown): number => {
   const scale = typeof value === 'number' ? value : Number(value);
   if (!Number.isFinite(scale)) return 0;
   // Only whole steps have a matching stylesheet rule and readout.
-  return Math.min(4, Math.max(0, Math.round(scale)));
+  return Math.min(MAX_TEXT_SCALE, Math.max(0, Math.round(scale)));
 };
 
 export function loadPreferences(fallbackLocale: Locale): Preferences {

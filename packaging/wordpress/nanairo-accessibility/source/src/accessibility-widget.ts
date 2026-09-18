@@ -2,12 +2,17 @@ import { LitElement, css, html, nothing, svg, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { normalizeLocale, translate, type Locale, type MessageKey } from './i18n';
 import { applyPageEffects, destroyPageEffects } from './page-effects';
+import { auditPage, type PageAuditResult } from './page-audit';
 import { collectSpeechSegments } from './speech';
-import { defaultPreferences, loadPreferences, savePreferences, type ColorMode, type Preferences } from './state';
+import { MAX_TEXT_SCALE, defaultPreferences, loadPreferences, savePreferences, type ColorMode, type Preferences } from './state';
 import logoMarkUrl from './assets/nanairo-logo-mark.png?inline';
 import logoHorizontalUrl from './assets/nanairo-logo-horizontal.png?inline';
 
 let instanceCount = 0;
+
+/** Indexed by Preferences.textScale; the last step is the 200% WCAG 1.4.4 asks for. */
+const TEXT_SCALE_PERCENTS = [100, 112, 125, 150, 175, 200] as const;
+const TEXT_SCALE_STEPS = TEXT_SCALE_PERCENTS.map((_, step) => step);
 let activeInstance: NanairoAccessibility | undefined;
 
 const COLOR_MODES = [
@@ -19,7 +24,7 @@ const COLOR_MODES = [
   { value: 'saturated', label: 'colorSaturated' },
 ] as const satisfies ReadonlyArray<{ value: ColorMode; label: MessageKey }>;
 
-const icon = (name: 'spark' | 'accessibility' | 'close' | 'minus' | 'plus' | 'type' | 'spacing' | 'link' | 'contrast' | 'font' | 'motion' | 'guide' | 'mask' | 'speech' | 'media' | 'reset') => {
+const icon = (name: 'spark' | 'accessibility' | 'close' | 'minus' | 'plus' | 'type' | 'spacing' | 'link' | 'contrast' | 'font' | 'motion' | 'guide' | 'mask' | 'speech' | 'media' | 'audit' | 'reset') => {
   const paths = {
     spark: svg`<path d="M12 2.75c.62 3.67 2.58 5.63 6.25 6.25-3.67.62-5.63 2.58-6.25 6.25C11.38 11.58 9.42 9.62 5.75 9 9.42 8.38 11.38 6.42 12 2.75Z"></path><path d="M18.4 14.3c.28 1.66 1.17 2.55 2.83 2.83-1.66.28-2.55 1.17-2.83 2.83-.28-1.66-1.17-2.55-2.83-2.83 1.66-.28 2.55-1.17 2.83-2.83Z"></path>`,
     accessibility: svg`<circle cx="12" cy="12" r="9.25"></circle><circle cx="12" cy="7" r="1.35" fill="currentColor" stroke="none"></circle><path d="M6.8 10.2c3.5 1.15 6.9 1.15 10.4 0M12 10.7v4M12 14.7 8.8 19M12 14.7l3.2 4.3"></path>`,
@@ -36,6 +41,7 @@ const icon = (name: 'spark' | 'accessibility' | 'close' | 'minus' | 'plus' | 'ty
     mask: svg`<path d="M4 4h16v16H4zM4 9h16M4 15h16"></path>`,
     speech: svg`<path d="M5 10v4h3l4 3V7L8 10H5ZM15 9.2a4 4 0 0 1 0 5.6M17.5 6.8a7.3 7.3 0 0 1 0 10.4"></path>`,
     media: svg`<rect x="3.5" y="5" width="17" height="14" rx="2.5"></rect><path d="m9 9.2 5 2.8-5 2.8V9.2ZM4 4l16 16"></path>`,
+    audit: svg`<path d="M9.5 5H6.8A1.8 1.8 0 0 0 5 6.8v10.4A1.8 1.8 0 0 0 6.8 19h10.4a1.8 1.8 0 0 0 1.8-1.8v-3.1M9 12l2.1 2.1L19 6.2"></path>`,
     reset: svg`<path d="M4.5 8A8 8 0 1 1 4 14M4.5 8V3.5M4.5 8H9"></path>`,
   };
 
@@ -52,6 +58,7 @@ export class NanairoAccessibility extends LitElement {
   @state() private preferences: Preferences = defaultPreferences();
   @state() private announcement = '';
   @state() private speaking = false;
+  @state() private auditResult: PageAuditResult | null = null;
 
   private readonly panelId = `nanairo-a11y-panel-${++instanceCount}`;
   private initialized = false;
@@ -154,12 +161,18 @@ export class NanairoAccessibility extends LitElement {
 
   private selectLocale(locale: Locale): void {
     this.stopSpeech(false);
+    this.auditResult = null;
     this.commit({ ...this.preferences, locale });
   }
 
   private setScale(delta: number): void {
-    const textScale = Math.max(0, Math.min(4, this.preferences.textScale + delta));
+    const textScale = Math.max(0, Math.min(MAX_TEXT_SCALE, this.preferences.textScale + delta));
     this.commit({ ...this.preferences, textScale });
+  }
+
+  private runAudit(): void {
+    this.auditResult = auditPage(this.locale);
+    this.announcement = this.t('auditDone');
   }
 
   private toggle(key: keyof Pick<Preferences, 'comfortableSpacing' | 'highlightLinks' | 'readableFont' | 'reduceMotion' | 'readingGuide' | 'readingMask' | 'mediaPaused'>): void {
@@ -264,6 +277,7 @@ export class NanairoAccessibility extends LitElement {
 
   private reset(): void {
     this.stopSpeech(false);
+    this.auditResult = null;
     this.commit(defaultPreferences(this.locale));
     this.announcement = this.t('resetDone');
     window.setTimeout(() => { this.announcement = ''; }, 1800);
@@ -303,7 +317,7 @@ export class NanairoAccessibility extends LitElement {
   }
 
   render() {
-    const scalePercent = [100, 112, 125, 150, 175][this.preferences.textScale];
+    const scalePercent = TEXT_SCALE_PERCENTS[this.preferences.textScale];
     return html`
       <button
         class="launcher"
@@ -361,9 +375,9 @@ export class NanairoAccessibility extends LitElement {
                   ${icon('minus')}
                 </button>
                 <div class="steps" aria-hidden="true">
-                  ${[0, 1, 2, 3, 4].map((step) => html`<span class=${step <= this.preferences.textScale ? 'filled' : ''}></span>`)}
+                  ${TEXT_SCALE_STEPS.map((step) => html`<span class=${step <= this.preferences.textScale ? 'filled' : ''}></span>`)}
                 </div>
-                <button type="button" aria-label=${this.t('increase')} ?disabled=${this.preferences.textScale === 4} @click=${() => this.setScale(1)}>
+                <button type="button" aria-label=${this.t('increase')} ?disabled=${this.preferences.textScale === MAX_TEXT_SCALE} @click=${() => this.setScale(1)}>
                   ${icon('plus')}
                 </button>
               </div>
@@ -423,6 +437,33 @@ export class NanairoAccessibility extends LitElement {
                 <span class="switch" aria-hidden="true"><span></span></span>
               </button>
               ${this.renderToggle('mediaPaused', 'media', 'mediaPaused', 'mediaPausedHint')}
+            </div>
+
+            <div class="section-heading">${this.t('auditSection')}</div>
+            <div class="audit-card">
+              <div class="audit-heading">
+                <span class="feature-icon">${icon('audit')}</span>
+                <span class="preference-copy">
+                  <span class="preference-title">${this.t('auditTitle')}</span>
+                  <span class="preference-hint">${this.t('auditHint')}</span>
+                </span>
+              </div>
+              <button class="audit-button" type="button" @click=${this.runAudit}>${icon('audit')}<span>${this.t('auditRun')}</span></button>
+              ${this.auditResult ? html`
+                <div class="audit-summary" role="status">
+                  <strong>${this.t('auditDone')}</strong>
+                  <span>${this.auditResult.warningCount}${this.t('auditWarnings')} · ${this.auditResult.manualCount}${this.t('auditManuals')}</span>
+                </div>
+                <ul class="audit-results">
+                  ${this.auditResult.items.map((item) => html`
+                    <li class="status-${item.status}">
+                      <span class="audit-status" aria-hidden="true">${item.status === 'warning' ? '!' : item.status === 'manual' ? '?' : '✓'}</span>
+                      <span><strong>${item.label}</strong><small>${item.detail}${item.count > 0 ? ` (${item.count})` : ''}</small></span>
+                    </li>
+                  `)}
+                </ul>
+                <p class="audit-disclaimer">${this.t('auditDisclaimer')}</p>
+              ` : nothing}
             </div>
 
             <p class="note">${this.t('note')}</p>
@@ -623,6 +664,22 @@ export class NanairoAccessibility extends LitElement {
     .swatch-saturated span { background: conic-gradient(#ff365f, #ffd600, #13bd68, #1c91ff, #9f45ff, #ff365f); }
 
     .note { margin: 2px 6px 6px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .audit-card { margin-bottom: 18px; padding: 15px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+    .audit-heading { display: flex; align-items: center; gap: 11px; }
+    .audit-button { width: 100%; min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; padding: 10px 16px; cursor: pointer; color: #fff; border: 1px solid var(--accent); border-radius: 9999px; background: var(--accent); font-size: 13px; font-weight: 700; }
+    .audit-button:hover { background: var(--accent-hover); }
+    .audit-button svg { width: 18px; height: 18px; }
+    .audit-summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; margin-top: 14px; padding: 10px 12px; border-radius: 14px; color: var(--ink); background: var(--soft); font-size: 11px; }
+    .audit-summary strong { font-size: 12px; }
+    .audit-results { display: grid; gap: 7px; margin: 10px 0 0; padding: 0; list-style: none; }
+    .audit-results li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px; align-items: start; padding: 9px; border: 1px solid var(--line); border-radius: 12px; }
+    .audit-results strong, .audit-results small { display: block; }
+    .audit-results strong { color: var(--ink); font-size: 11px; line-height: 1.5; }
+    .audit-results small { margin-top: 2px; color: var(--muted); font-size: 10px; line-height: 1.55; }
+    .audit-status { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: #568477; font-size: 11px; font-weight: 800; }
+    .status-warning .audit-status { background: #9a5b36; }
+    .status-manual .audit-status { color: #4f5b58; background: #dce4e1; }
+    .audit-disclaimer { margin: 10px 2px 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
     .panel-footer { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 16px; border-top: 1px solid var(--line); background: #fff; }
     .reset-button { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 9px 14px; cursor: pointer; color: var(--ink); border: 1px solid var(--line); border-radius: 9999px; background: #fff; font-size: 12px; font-weight: 650; }
     .reset-button:hover { color: var(--accent-hover); border-color: var(--accent); background: var(--soft); }
@@ -643,18 +700,22 @@ export class NanairoAccessibility extends LitElement {
     }
 
     @media (max-width: 520px) {
-      :host { --drawer-width: calc(100vw - 42px); }
+      :host { --drawer-width: 100vw; }
       .launcher { width: 108px; min-height: 51px; gap: 8px; padding: 7px 10px 7px 8px; border-radius: 10px 0 0 10px; }
       :host([position="left"]) .launcher { border-radius: 0 11px 11px 0; }
       .launcher:hover { width: 114px; }
       .launcher-mark { width: 32px; height: 32px; }
       .launcher-mark svg { width: 20px; height: 20px; }
       .launcher-label { font-size: 9px; }
-      .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 42px; min-height: 58px; border-radius: 11px 0 0 11px; }
-      .launcher[aria-expanded="true"]:hover { width: 42px; }
-      :host([position="left"]) .launcher[aria-expanded="true"] { right: auto; left: var(--drawer-width); border-radius: 0 12px 12px 0; }
-      .panel { border-radius: 24px 0 0 24px; }
-      :host([position="left"]) .panel { border-radius: 0 24px 24px 0; }
+      .launcher[aria-expanded="true"] { display: none; }
+      .panel,
+      :host([position="left"]) .panel {
+        width: 100vw;
+        max-width: 100vw;
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
+      }
       .color-heading { flex-wrap: wrap; gap: 4px 12px; }
     }
 
