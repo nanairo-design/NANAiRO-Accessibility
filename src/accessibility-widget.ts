@@ -1,12 +1,23 @@
-import { LitElement, css, html, nothing, svg } from 'lit';
+import { LitElement, css, html, nothing, svg, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { messages, type Locale, type MessageKey } from './i18n';
+import { normalizeLocale, translate, type Locale, type MessageKey } from './i18n';
 import { applyPageEffects, destroyPageEffects } from './page-effects';
+import { collectSpeechSegments } from './speech';
 import { defaultPreferences, loadPreferences, savePreferences, type ColorMode, type Preferences } from './state';
 import logoMarkUrl from './assets/nanairo-logo-mark.png?inline';
 import logoHorizontalUrl from './assets/nanairo-logo-horizontal.png?inline';
 
 let instanceCount = 0;
+let activeInstance: NanairoAccessibility | undefined;
+
+const COLOR_MODES = [
+  { value: 'default', label: 'colorDefault' },
+  { value: 'dark', label: 'colorDark' },
+  { value: 'light', label: 'colorLight' },
+  { value: 'high-contrast', label: 'colorHighContrast' },
+  { value: 'monochrome', label: 'colorMonochrome' },
+  { value: 'saturated', label: 'colorSaturated' },
+] as const satisfies ReadonlyArray<{ value: ColorMode; label: MessageKey }>;
 
 const icon = (name: 'spark' | 'accessibility' | 'close' | 'minus' | 'plus' | 'type' | 'spacing' | 'link' | 'contrast' | 'font' | 'motion' | 'guide' | 'mask' | 'speech' | 'media' | 'reset') => {
   const paths = {
@@ -48,10 +59,18 @@ export class NanairoAccessibility extends LitElement {
   private speechSession = 0;
 
   connectedCallback(): void {
+    // Two widgets would fight over the same stored preferences and stack two
+    // launchers on top of each other, so only the first one stays.
+    if (activeInstance && activeInstance !== this && activeInstance.isConnected) {
+      console.warn('[nanairo-accessibility] A widget is already active on this page; the duplicate element was removed.');
+      this.remove();
+      return;
+    }
+    activeInstance = this;
+
     super.connectedCallback();
     if (!this.initialized) {
-      const requestedLocale = this.getAttribute('locale');
-      this.locale = requestedLocale === 'en' ? 'en' : 'ja';
+      this.locale = normalizeLocale(this.getAttribute('locale'));
       this.preferences = loadPreferences(this.locale);
       this.locale = this.preferences.locale;
       applyPageEffects(this.preferences);
@@ -59,17 +78,34 @@ export class NanairoAccessibility extends LitElement {
     }
     document.addEventListener('pointerdown', this.handleDocumentPointerDown);
     window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('pagehide', this.handlePageHide);
   }
 
   disconnectedCallback(): void {
+    if (activeInstance === this) activeInstance = undefined;
     document.removeEventListener('pointerdown', this.handleDocumentPointerDown);
     window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('pagehide', this.handlePageHide);
     this.stopSpeech(false);
     super.disconnectedCallback();
   }
 
+  /**
+   * `locale` and `position` are reflected properties, so any string can be
+   * assigned after construction. Normalizing here keeps rendering safe.
+   */
+  protected willUpdate(changed: PropertyValues<this>): void {
+    if (changed.has('locale')) {
+      const normalized = normalizeLocale(this.locale);
+      if (normalized !== this.locale) this.locale = normalized;
+    }
+    if (changed.has('position') && this.position !== 'left' && this.position !== 'right') {
+      this.position = 'right';
+    }
+  }
+
   private t(key: MessageKey): string {
-    return messages[this.locale][key];
+    return translate(this.locale, key);
   }
 
   private commit(next: Preferences): void {
@@ -86,6 +122,11 @@ export class NanairoAccessibility extends LitElement {
 
   private handleDocumentPointerDown = (event: PointerEvent): void => {
     if (this.open && !event.composedPath().includes(this)) this.closePanel(false);
+  };
+
+  // Speech keeps running across a navigation in some browsers unless cancelled.
+  private handlePageHide = (): void => {
+    this.stopSpeech(false);
   };
 
   private handleKeyDown = (event: KeyboardEvent): void => {
@@ -125,6 +166,43 @@ export class NanairoAccessibility extends LitElement {
     this.commit({ ...this.preferences, [key]: !this.preferences[key] });
   }
 
+  private colorModeButtons(): HTMLButtonElement[] {
+    return Array.from(this.renderRoot.querySelectorAll<HTMLButtonElement>('.color-mode-grid [role="radio"]'));
+  }
+
+  /**
+   * A radiogroup is expected to be a single tab stop navigated with the arrow
+   * keys, with selection following focus. Home/End jump to the ends.
+   */
+  private async moveColorMode(target: number | 'first' | 'last'): Promise<void> {
+    const current = COLOR_MODES.findIndex(({ value }) => value === this.preferences.colorMode);
+    const index = target === 'first'
+      ? 0
+      : target === 'last'
+        ? COLOR_MODES.length - 1
+        : (Math.max(0, current) + target + COLOR_MODES.length) % COLOR_MODES.length;
+
+    this.setColorMode(COLOR_MODES[index].value);
+    await this.updateComplete;
+    this.colorModeButtons()[index]?.focus();
+  }
+
+  private handleColorModeKeyDown = (event: KeyboardEvent): void => {
+    const step = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1
+      : event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1
+        : undefined;
+
+    if (step !== undefined) {
+      event.preventDefault();
+      void this.moveColorMode(step);
+      return;
+    }
+    if (event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+      void this.moveColorMode(event.key === 'Home' ? 'first' : 'last');
+    }
+  };
+
   private setColorMode(colorMode: ColorMode): void {
     this.commit({
       ...this.preferences,
@@ -135,17 +213,7 @@ export class NanairoAccessibility extends LitElement {
 
   private pageSpeechSegments(): string[] {
     const root = document.querySelector('main') ?? document.body;
-    const elements = root.querySelectorAll<HTMLElement>('h1, h2, h3, p, blockquote, figcaption');
-    const segments: string[] = [];
-
-    elements.forEach((element) => {
-      if (element.closest('[aria-hidden="true"], nanairo-accessibility') || element.hidden) return;
-      const text = element.textContent?.replace(/\s+/g, ' ').trim();
-      if (!text) return;
-      for (let start = 0; start < text.length; start += 220) segments.push(text.slice(start, start + 220));
-    });
-
-    return segments;
+    return root ? collectSpeechSegments(root) : [];
   }
 
   private speakNext(session: number): void {
@@ -236,15 +304,6 @@ export class NanairoAccessibility extends LitElement {
 
   render() {
     const scalePercent = [100, 112, 125, 150, 175][this.preferences.textScale];
-    const colorModes = [
-      { value: 'default', label: 'colorDefault' },
-      { value: 'dark', label: 'colorDark' },
-      { value: 'light', label: 'colorLight' },
-      { value: 'high-contrast', label: 'colorHighContrast' },
-      { value: 'monochrome', label: 'colorMonochrome' },
-      { value: 'saturated', label: 'colorSaturated' },
-    ] as const;
-
     return html`
       <button
         class="launcher"
@@ -321,13 +380,19 @@ export class NanairoAccessibility extends LitElement {
               <span>${this.t('colorModes')}</span>
               <small>${this.t('colorModeHint')}</small>
             </div>
-            <div class="color-mode-grid" role="radiogroup" aria-label=${this.t('colorModes')}>
-              ${colorModes.map(({ value, label }) => html`
+            <div
+              class="color-mode-grid"
+              role="radiogroup"
+              aria-label=${this.t('colorModes')}
+              @keydown=${this.handleColorModeKeyDown}
+            >
+              ${COLOR_MODES.map(({ value, label }) => html`
                 <button
                   class="color-mode ${this.preferences.colorMode === value ? 'active' : ''}"
                   type="button"
                   role="radio"
                   aria-checked=${this.preferences.colorMode === value}
+                  tabindex=${this.preferences.colorMode === value ? 0 : -1}
                   @click=${() => this.setColorMode(value)}
                 >
                   <span class="color-swatch swatch-${value}" aria-hidden="true"><span></span></span>

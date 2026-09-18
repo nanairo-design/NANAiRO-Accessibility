@@ -104,3 +104,15 @@ export const messages = {
 } as const;
 
 export type MessageKey = keyof (typeof messages)['ja'];
+
+export const isLocale = (value: unknown): value is Locale => value === 'ja' || value === 'en';
+
+export const normalizeLocale = (value: unknown, fallback: Locale = 'ja'): Locale => (
+  isLocale(value) ? value : fallback
+);
+
+/**
+ * Looks a message up defensively. `locale` may arrive from an attribute or from
+ * stored preferences, so an unsupported value must not break rendering.
+ */
+export const translate = (locale: unknown, key: MessageKey): string => messages[normalizeLocale(locale)][key];
