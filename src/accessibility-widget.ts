@@ -489,7 +489,7 @@ export class NanairoAccessibility extends LitElement {
     .preference-row:focus-visible { outline-offset: -4px; }
     .launcher-mark { position: relative; width: 36px; height: 36px; display: grid; place-items: center; flex: none; color: var(--accent); border-radius: 50%; background: #fff; transition: opacity .18s ease, transform .28s ease; }
     .launcher-mark svg { width: 23px; height: 23px; stroke-width: 1.8; }
-    .launcher-label { display: grid; justify-items: start; gap: 1px; font-size: 10px; font-weight: 800; letter-spacing: .05em; line-height: 1.08; text-align: left; writing-mode: horizontal-tb; transition: opacity .18s ease, transform .28s ease; }
+    .launcher-label { display: grid; justify-items: start; gap: 1px; font-size: 12px; font-weight: 800; letter-spacing: .05em; line-height: 1.08; text-align: left; writing-mode: horizontal-tb; transition: opacity .18s ease, transform .28s ease; }
     .launcher-arrow { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: translateX(8px); transition: opacity .22s ease .12s, transform .36s cubic-bezier(.22,.8,.2,1) .08s; }
     .launcher-arrow svg { width: 24px; height: 24px; stroke-width: 1.7; }
     .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 46px; min-height: 62px; padding: 0; border-radius: 12px 0 0 12px; animation: none; }
@@ -637,7 +637,7 @@ export class NanairoAccessibility extends LitElement {
       .launcher:hover { width: 114px; }
       .launcher-mark { width: 32px; height: 32px; }
       .launcher-mark svg { width: 20px; height: 20px; }
-      .launcher-label { font-size: 9px; }
+      .launcher-label { font-size: 11px; }
       .launcher[aria-expanded="true"] { display: none; }
       .panel,
       :host([position="left"]) .panel {
