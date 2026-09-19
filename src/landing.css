@@ -42,10 +42,6 @@ h1 { margin: 0 0 18px; font-size: clamp(32px, 3.65vw, 48px); font-weight: 750; l
 .hero-mobile-break { display: none; }
 .lead { margin: 0; max-width: 38em; color: var(--muted); font-size: 15px; line-height: 2; }
 .hero-question { margin: 0; color: var(--ink); font-size: 17px; font-weight: 700; line-height: 1.7; text-wrap: balance; }
-.hero-fact { margin-top: 18px; padding: 18px 20px; border-left: 3px solid var(--teal); border-radius: 0 14px 14px 0; background: var(--soft); }
-.hero-fact strong { display: block; font-size: 15px; line-height: 1.65; }
-.hero-fact p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
-.hero-fact small { display: block; margin-top: 7px; color: var(--muted); font-size: 10px; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .primary, .secondary, .download-button { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 50px; padding: 12px 24px; border: 1px solid transparent; border-radius: 999px; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; transition: background .2s, color .2s, transform .2s; }
 .primary, .download-button { background: var(--teal); color: #fff; }
@@ -205,7 +201,6 @@ html[data-nanairo-color="dark"] .demo-icon {
   h1 { font-size: clamp(28px, 7.2vw, 36px); }
   .hero-mobile-break { display: initial; }
   .hero-question { font-size: 16px; }
-  .hero-fact { padding: 16px 17px; }
   .hero-actions { flex-direction: column; align-items: stretch; }
   .visual { min-height: 350px; margin: -20px 0 0 24px; padding-top: 35px; }
   .demo-panel { width: min(270px, 82%); margin-left: 0; padding: 20px; }
