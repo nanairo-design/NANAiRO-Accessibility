@@ -5,6 +5,8 @@ export const messages = {
     open: 'アクセシビリティ設定を開く',
     close: 'アクセシビリティ設定を閉じる',
     title: '表示サポート',
+    launcherLine1: '表示',
+    launcherLine2: 'サポート',
     subtitle: '見やすさを、あなた好みに。',
     language: '表示言語',
     appearance: '文字と表示',
@@ -46,7 +48,9 @@ export const messages = {
     mediaPausedHint: 'ページ内の動画と音声をまとめて停止します',
     auditSection: 'ページの確認',
     auditTitle: '簡易アクセシビリティチェック',
-    auditHint: '12項目の問題候補をこのページから探します',
+    auditHint: 'ガイドブックの重大・必須項目から問題候補をこのページで探します',
+    auditSevere: '重大（達成しないと重大な悪影響）',
+    auditRequired: '必須（必ず達成しなければならない）',
     auditRun: 'このページをチェック',
     auditDone: 'チェックが完了しました',
     auditWarnings: '項目に問題候補',
@@ -63,6 +67,8 @@ export const messages = {
     open: 'Open accessibility preferences',
     close: 'Close accessibility preferences',
     title: 'Display support',
+    launcherLine1: 'Display',
+    launcherLine2: 'support',
     subtitle: 'Make this page comfortable for you.',
     language: 'Language',
     appearance: 'Text & display',
@@ -104,7 +110,9 @@ export const messages = {
     mediaPausedHint: 'Pause and mute all audio and video on this page',
     auditSection: 'Page review',
     auditTitle: 'Quick accessibility check',
-    auditHint: 'Scan this page for candidates across 12 checks',
+    auditHint: 'Scan this page for candidates against the guidebook checks',
+    auditSevere: 'Critical (severe impact if unmet)',
+    auditRequired: 'Required (must be met)',
     auditRun: 'Check this page',
     auditDone: 'Check complete',
     auditWarnings: 'checks with candidates',
@@ -120,3 +128,15 @@ export const messages = {
 } as const;
 
 export type MessageKey = keyof (typeof messages)['ja'];
+
+export const isLocale = (value: unknown): value is Locale => value === 'ja' || value === 'en';
+
+export const normalizeLocale = (value: unknown, fallback: Locale = 'ja'): Locale => (
+  isLocale(value) ? value : fallback
+);
+
+/**
+ * Looks a message up defensively. `locale` may arrive from an attribute or from
+ * stored preferences, so an unsupported value must not break rendering.
+ */
+export const translate = (locale: unknown, key: MessageKey): string => messages[normalizeLocale(locale)][key];

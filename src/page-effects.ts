@@ -32,25 +32,34 @@ html[data-nanairo-color="dark"] body {
   color-scheme: dark;
 }
 
-html[data-nanairo-color="dark"] body :where(main, section, article, aside, header, footer, nav, div, ul, ol, li, table, thead, tbody, tr, td, th, form) {
+/*
+ * Every element gets readable text on a dark surface. Listing element names
+ * instead left anything unlisted (summary, caption, legend, time, em, code...)
+ * with the site's own dark text on the new dark background. Kept at :where()
+ * specificity so the targeted rules below still win on source order.
+ */
+html[data-nanairo-color="dark"] body :not(:where(nanairo-accessibility, nanairo-accessibility *)) {
   color: #f7fbf9 !important;
+  background-color: transparent !important;
+  text-shadow: none !important;
+}
+
+html[data-nanairo-color="dark"] body :where(main, section, article, aside, header, footer, nav, div, ul, ol, li, table, thead, tbody, tr, td, th, form) {
   background-color: #181b1a !important;
   background-image: none !important;
   border-color: #59645f !important;
   box-shadow: none !important;
-  text-shadow: none !important;
-}
-
-html[data-nanairo-color="dark"] body :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, blockquote, figcaption, label, span, strong, small) {
-  color: #f7fbf9 !important;
-  background-color: transparent !important;
-  text-shadow: none !important;
 }
 
 html[data-nanairo-color="dark"] body :where(input, select, textarea, button) {
   color: #fff !important;
   background-color: #252a28 !important;
   border-color: #76827d !important;
+}
+
+html[data-nanairo-color="dark"] body :where(mark) {
+  color: #181b1a !important;
+  background-color: #f2cf6b !important;
 }
 
 html[data-nanairo-color="dark"] body a:not([data-nanairo-ignore]) {
@@ -60,21 +69,28 @@ html[data-nanairo-color="dark"] body a:not([data-nanairo-ignore]) {
   text-decoration-color: currentColor !important;
 }
 
-html[data-nanairo-color="light"] body,
-html[data-nanairo-color="light"] body :where(main, section, article, aside, header, footer, nav, div, ul, ol, li, table, thead, tbody, tr, td, th, form) {
+html[data-nanairo-color="light"] body {
   color: #27272d !important;
+  background-color: #fff !important;
+  color-scheme: light;
+}
+
+html[data-nanairo-color="light"] body :not(:where(nanairo-accessibility, nanairo-accessibility *)) {
+  color: #27272d !important;
+  background-color: transparent !important;
+  text-shadow: none !important;
+}
+
+html[data-nanairo-color="light"] body :where(main, section, article, aside, header, footer, nav, div, ul, ol, li, table, thead, tbody, tr, td, th, form) {
   background-color: #fff !important;
   background-image: none !important;
   border-color: #b7bfbc !important;
   box-shadow: none !important;
-  text-shadow: none !important;
-  color-scheme: light;
 }
 
-html[data-nanairo-color="light"] body :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, blockquote, figcaption, label, span, strong, small, a) {
+html[data-nanairo-color="light"] body :where(mark) {
   color: #27272d !important;
-  background-color: transparent !important;
-  text-shadow: none !important;
+  background-color: #ffe9a3 !important;
 }
 
 html[data-nanairo-color="monochrome"] body > :not(nanairo-accessibility) {
@@ -85,21 +101,19 @@ html[data-nanairo-color="saturated"] body > :not(nanairo-accessibility) {
   filter: saturate(180%) contrast(105%) !important;
 }
 
-html[data-nanairo-contrast="high"] body,
-html[data-nanairo-contrast="high"] body :where(main, section, article, aside, header, footer, nav) {
+html[data-nanairo-contrast="high"] body {
   color: #000 !important;
   background-color: #fff !important;
-  background-image: none !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
 }
 
-html[data-nanairo-contrast="high"] body :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, blockquote, figcaption, label, span, strong, small) {
+/* Same reasoning as the dark mode sweep above: cover every element, not a list. */
+html[data-nanairo-contrast="high"] body :not(:where(nanairo-accessibility, nanairo-accessibility *)) {
   color: #000 !important;
+  background-color: transparent !important;
   text-shadow: none !important;
 }
 
-html[data-nanairo-contrast="high"] body :where(div, ul, ol, li) {
+html[data-nanairo-contrast="high"] body :where(main, section, article, aside, header, footer, nav, div, ul, ol, li, table, thead, tbody, tr, td, th, form) {
   background-color: #fff !important;
   background-image: none !important;
   box-shadow: none !important;
@@ -116,6 +130,11 @@ html[data-nanairo-contrast="high"] body :where(a, button, input, select, textare
   background: #fff !important;
   border-color: #000 !important;
   box-shadow: none !important;
+}
+
+html[data-nanairo-contrast="high"] body :where(mark) {
+  color: #000 !important;
+  background-color: #ffe9a3 !important;
 }
 
 html[data-nanairo-contrast="high"] body a:not([data-nanairo-ignore]) {
@@ -176,12 +195,17 @@ html[data-nanairo-motion="reduce"] *::after {
 }
 `;
 
+interface MediaState {
+  muted: boolean;
+  paused: boolean;
+}
+
 let pointerListenerAttached = false;
 let mediaObserver: MutationObserver | undefined;
-const mediaStates = new Map<HTMLMediaElement, { muted: boolean }>();
+const mediaStates = new Map<HTMLMediaElement, MediaState>();
 
 function ensureStyles(): void {
-  if (document.getElementById(STYLE_ID)) return;
+  if (!document.head || document.getElementById(STYLE_ID)) return;
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = PAGE_STYLES;
@@ -206,22 +230,41 @@ function updatePointerPosition(event: PointerEvent): void {
 }
 
 function stopAndMuteMedia(media: HTMLMediaElement): void {
-  if (!mediaStates.has(media)) mediaStates.set(media, { muted: media.muted });
+  // Record the state once, before the first pause, so it survives re-entry.
+  if (!mediaStates.has(media)) mediaStates.set(media, { muted: media.muted, paused: media.paused });
   media.pause();
   media.muted = true;
 }
 
+function eachMedia(node: Node, visit: (media: HTMLMediaElement) => void): void {
+  if (node instanceof HTMLMediaElement) visit(node);
+  if (node instanceof Element) node.querySelectorAll<HTMLMediaElement>('audio, video').forEach(visit);
+}
+
 function inspectAddedMedia(node: Node): void {
-  if (node instanceof HTMLMediaElement) stopAndMuteMedia(node);
-  if (node instanceof Element) node.querySelectorAll<HTMLMediaElement>('audio, video').forEach(stopAndMuteMedia);
+  eachMedia(node, stopAndMuteMedia);
+}
+
+/**
+ * Mutation records are delivered in a microtask, so an element that was only
+ * moved is connected again by now. Anything still detached is really gone and
+ * must not be retained by the state map.
+ */
+function forgetDetachedMedia(node: Node): void {
+  eachMedia(node, (media) => {
+    if (!media.isConnected) mediaStates.delete(media);
+  });
 }
 
 function setMediaControl(active: boolean): void {
   if (active) {
     document.querySelectorAll<HTMLMediaElement>('audio, video').forEach(stopAndMuteMedia);
-    if (!mediaObserver) {
+    if (!mediaObserver && document.body) {
       mediaObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => mutation.addedNodes.forEach(inspectAddedMedia));
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach(inspectAddedMedia);
+          mutation.removedNodes.forEach(forgetDetachedMedia);
+        });
       });
       mediaObserver.observe(document.body, { childList: true, subtree: true });
     }
@@ -231,12 +274,52 @@ function setMediaControl(active: boolean): void {
   mediaObserver?.disconnect();
   mediaObserver = undefined;
   mediaStates.forEach((state, media) => {
-    if (media.isConnected) media.muted = state.muted;
+    if (!media.isConnected) return;
+    media.muted = state.muted;
+    // Restore playback too; muting alone left the page permanently paused.
+    if (!state.paused) void media.play().catch(() => undefined);
   });
   mediaStates.clear();
 }
 
+/** The `data-nanairo-*` attributes on `<html>` that drive every page override. */
+const EFFECT_DATA_KEYS = [
+  'nanairoTextScale',
+  'nanairoSpacing',
+  'nanairoLinks',
+  'nanairoColor',
+  'nanairoContrast',
+  'nanairoFont',
+  'nanairoMotion',
+] as const;
+
+/**
+ * Runs `measure` with this widget's own page overrides switched off.
+ *
+ * Anything that inspects the page — the audit in particular — has to see the
+ * site's real colours and sizes. Measuring while a colour mode is active
+ * reports the values this widget just forced, so a high-contrast run would
+ * find no contrast problem on any page at all.
+ */
+export function withPageEffectsSuspended<T>(measure: () => T): T {
+  const root = document.documentElement;
+  const saved = EFFECT_DATA_KEYS.map((key) => [key, root.dataset[key]] as const);
+
+  for (const [key] of saved) delete root.dataset[key];
+  try {
+    // Style resolution is synchronous on query, so getComputedStyle inside
+    // `measure` already reflects the suspension.
+    return measure();
+  } finally {
+    for (const [key, value] of saved) {
+      if (value === undefined) delete root.dataset[key];
+      else root.dataset[key] = value;
+    }
+  }
+}
+
 export function applyPageEffects(preferences: Preferences): void {
+  if (!document.body) return;
   ensureStyles();
   const root = document.documentElement;
 

@@ -1,13 +1,37 @@
-import { LitElement, css, html, nothing, svg } from 'lit';
+import { LitElement, css, html, nothing, svg, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { messages, type Locale, type MessageKey } from './i18n';
+import { normalizeLocale, translate, type Locale, type MessageKey } from './i18n';
 import { applyPageEffects, destroyPageEffects } from './page-effects';
-import { auditPage, type PageAuditResult } from './page-audit';
-import { defaultPreferences, loadPreferences, savePreferences, type ColorMode, type Preferences } from './state';
+import { auditPage, type AuditSeverity, type PageAuditResult } from './page-audit';
+import { collectSpeechSegments } from './speech';
+import { MAX_TEXT_SCALE, defaultPreferences, loadPreferences, savePreferences, type ColorMode, type Preferences } from './state';
 import logoMarkUrl from './assets/nanairo-logo-mark.png?inline';
 import logoHorizontalUrl from './assets/nanairo-logo-horizontal.png?inline';
 
 let instanceCount = 0;
+
+/** Indexed by Preferences.textScale; the last step is the 200% WCAG 1.4.4 asks for. */
+const TEXT_SCALE_PERCENTS = [100, 112, 125, 150, 175, 200] as const;
+
+/*
+ * Non-ASCII text lives in string literals, never directly inside an html``
+ * template: a bundler cannot escape a tagged template's raw strings, and an
+ * unescaped bundle is decoded with the host page's encoding, which turns the
+ * Japanese UI into mojibake on a Shift_JIS page.
+ */
+const LANGUAGE_NAMES = { ja: '\u65e5\u672c\u8a9e', en: 'English' } as const;
+const SUMMARY_SEPARATOR = ' \u00b7 ';
+const TEXT_SCALE_STEPS = TEXT_SCALE_PERCENTS.map((_, step) => step);
+let activeInstance: NanairoAccessibility | undefined;
+
+const COLOR_MODES = [
+  { value: 'default', label: 'colorDefault' },
+  { value: 'dark', label: 'colorDark' },
+  { value: 'light', label: 'colorLight' },
+  { value: 'high-contrast', label: 'colorHighContrast' },
+  { value: 'monochrome', label: 'colorMonochrome' },
+  { value: 'saturated', label: 'colorSaturated' },
+] as const satisfies ReadonlyArray<{ value: ColorMode; label: MessageKey }>;
 
 const icon = (name: 'spark' | 'accessibility' | 'close' | 'minus' | 'plus' | 'type' | 'spacing' | 'link' | 'contrast' | 'font' | 'motion' | 'guide' | 'mask' | 'speech' | 'media' | 'audit' | 'reset') => {
   const paths = {
@@ -51,10 +75,18 @@ export class NanairoAccessibility extends LitElement {
   private speechSession = 0;
 
   connectedCallback(): void {
+    // Two widgets would fight over the same stored preferences and stack two
+    // launchers on top of each other, so only the first one stays.
+    if (activeInstance && activeInstance !== this && activeInstance.isConnected) {
+      console.warn('[nanairo-accessibility] A widget is already active on this page; the duplicate element was removed.');
+      this.remove();
+      return;
+    }
+    activeInstance = this;
+
     super.connectedCallback();
     if (!this.initialized) {
-      const requestedLocale = this.getAttribute('locale');
-      this.locale = requestedLocale === 'en' ? 'en' : 'ja';
+      this.locale = normalizeLocale(this.getAttribute('locale'));
       this.preferences = loadPreferences(this.locale);
       this.locale = this.preferences.locale;
       applyPageEffects(this.preferences);
@@ -62,17 +94,34 @@ export class NanairoAccessibility extends LitElement {
     }
     document.addEventListener('pointerdown', this.handleDocumentPointerDown);
     window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('pagehide', this.handlePageHide);
   }
 
   disconnectedCallback(): void {
+    if (activeInstance === this) activeInstance = undefined;
     document.removeEventListener('pointerdown', this.handleDocumentPointerDown);
     window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('pagehide', this.handlePageHide);
     this.stopSpeech(false);
     super.disconnectedCallback();
   }
 
+  /**
+   * `locale` and `position` are reflected properties, so any string can be
+   * assigned after construction. Normalizing here keeps rendering safe.
+   */
+  protected willUpdate(changed: PropertyValues<this>): void {
+    if (changed.has('locale')) {
+      const normalized = normalizeLocale(this.locale);
+      if (normalized !== this.locale) this.locale = normalized;
+    }
+    if (changed.has('position') && this.position !== 'left' && this.position !== 'right') {
+      this.position = 'right';
+    }
+  }
+
   private t(key: MessageKey): string {
-    return messages[this.locale][key];
+    return translate(this.locale, key);
   }
 
   private commit(next: Preferences): void {
@@ -89,6 +138,11 @@ export class NanairoAccessibility extends LitElement {
 
   private handleDocumentPointerDown = (event: PointerEvent): void => {
     if (this.open && !event.composedPath().includes(this)) this.closePanel(false);
+  };
+
+  // Speech keeps running across a navigation in some browsers unless cancelled.
+  private handlePageHide = (): void => {
+    this.stopSpeech(false);
   };
 
   private handleKeyDown = (event: KeyboardEvent): void => {
@@ -121,18 +175,80 @@ export class NanairoAccessibility extends LitElement {
   }
 
   private setScale(delta: number): void {
-    const textScale = Math.max(0, Math.min(5, this.preferences.textScale + delta));
+    const textScale = Math.max(0, Math.min(MAX_TEXT_SCALE, this.preferences.textScale + delta));
     this.commit({ ...this.preferences, textScale });
   }
 
-  private runAudit(): void {
+  private async runAudit(): Promise<void> {
     this.auditResult = auditPage(this.locale);
-    this.announcement = this.t('auditDone');
+    // Clearing first guarantees the live region changes, so a second run with
+    // an identical result is still announced.
+    this.announcement = '';
+    await this.updateComplete;
+    const { warningCount, manualCount } = this.auditResult;
+    this.announcement = `${this.t('auditDone')} ${warningCount}${this.t('auditWarnings')} / ${manualCount}${this.t('auditManuals')}`;
+  }
+
+  private renderAuditGroup(severity: AuditSeverity, headingKey: MessageKey) {
+    const items = this.auditResult?.items.filter((item) => item.severity === severity) ?? [];
+    if (!items.length) return nothing;
+    return html`
+      <p class="audit-group">${this.t(headingKey)}</p>
+      <ul class="audit-results">
+        ${items.map((item) => html`
+          <li class="status-${item.status}">
+            <span class="audit-status" aria-hidden="true">${item.status === 'warning' ? '!' : item.status === 'manual' ? '?' : '✓'}</span>
+            <span>
+              <strong>${item.label}</strong>
+              <small>${item.detail}${item.count > 0 ? ` (${item.count})` : ''}</small>
+              ${item.note ? html`<small class="audit-note">${item.note}</small>` : nothing}
+            </span>
+          </li>
+        `)}
+      </ul>
+    `;
   }
 
   private toggle(key: keyof Pick<Preferences, 'comfortableSpacing' | 'highlightLinks' | 'readableFont' | 'reduceMotion' | 'readingGuide' | 'readingMask' | 'mediaPaused'>): void {
     this.commit({ ...this.preferences, [key]: !this.preferences[key] });
   }
+
+  private colorModeButtons(): HTMLButtonElement[] {
+    return Array.from(this.renderRoot.querySelectorAll<HTMLButtonElement>('.color-mode-grid [role="radio"]'));
+  }
+
+  /**
+   * A radiogroup is expected to be a single tab stop navigated with the arrow
+   * keys, with selection following focus. Home/End jump to the ends.
+   */
+  private async moveColorMode(target: number | 'first' | 'last'): Promise<void> {
+    const current = COLOR_MODES.findIndex(({ value }) => value === this.preferences.colorMode);
+    const index = target === 'first'
+      ? 0
+      : target === 'last'
+        ? COLOR_MODES.length - 1
+        : (Math.max(0, current) + target + COLOR_MODES.length) % COLOR_MODES.length;
+
+    this.setColorMode(COLOR_MODES[index].value);
+    await this.updateComplete;
+    this.colorModeButtons()[index]?.focus();
+  }
+
+  private handleColorModeKeyDown = (event: KeyboardEvent): void => {
+    const step = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1
+      : event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1
+        : undefined;
+
+    if (step !== undefined) {
+      event.preventDefault();
+      void this.moveColorMode(step);
+      return;
+    }
+    if (event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+      void this.moveColorMode(event.key === 'Home' ? 'first' : 'last');
+    }
+  };
 
   private setColorMode(colorMode: ColorMode): void {
     this.commit({
@@ -144,17 +260,7 @@ export class NanairoAccessibility extends LitElement {
 
   private pageSpeechSegments(): string[] {
     const root = document.querySelector('main') ?? document.body;
-    const elements = root.querySelectorAll<HTMLElement>('h1, h2, h3, p, blockquote, figcaption');
-    const segments: string[] = [];
-
-    elements.forEach((element) => {
-      if (element.closest('[aria-hidden="true"], nanairo-accessibility') || element.hidden) return;
-      const text = element.textContent?.replace(/\s+/g, ' ').trim();
-      if (!text) return;
-      for (let start = 0; start < text.length; start += 220) segments.push(text.slice(start, start + 220));
-    });
-
-    return segments;
+    return root ? collectSpeechSegments(root) : [];
   }
 
   private speakNext(session: number): void {
@@ -245,16 +351,7 @@ export class NanairoAccessibility extends LitElement {
   }
 
   render() {
-    const scalePercent = [100, 112, 125, 150, 175, 200][this.preferences.textScale];
-    const colorModes = [
-      { value: 'default', label: 'colorDefault' },
-      { value: 'dark', label: 'colorDark' },
-      { value: 'light', label: 'colorLight' },
-      { value: 'high-contrast', label: 'colorHighContrast' },
-      { value: 'monochrome', label: 'colorMonochrome' },
-      { value: 'saturated', label: 'colorSaturated' },
-    ] as const;
-
+    const scalePercent = TEXT_SCALE_PERCENTS[this.preferences.textScale];
     return html`
       <button
         class="launcher"
@@ -266,7 +363,7 @@ export class NanairoAccessibility extends LitElement {
         @click=${() => this.open ? this.closePanel(false) : this.openPanel()}
       >
         <span class="launcher-mark" aria-hidden="true">${icon('accessibility')}</span>
-        <span class="launcher-label" aria-hidden="true"><span>表示</span><span>サポート</span></span>
+        <span class="launcher-label" aria-hidden="true"><span>${this.t('launcherLine1')}</span><span>${this.t('launcherLine2')}</span></span>
         <span class="launcher-arrow" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"></path></svg>
         </span>
@@ -312,9 +409,9 @@ export class NanairoAccessibility extends LitElement {
                   ${icon('minus')}
                 </button>
                 <div class="steps" aria-hidden="true">
-                  ${[0, 1, 2, 3, 4, 5].map((step) => html`<span class=${step <= this.preferences.textScale ? 'filled' : ''}></span>`)}
+                  ${TEXT_SCALE_STEPS.map((step) => html`<span class=${step <= this.preferences.textScale ? 'filled' : ''}></span>`)}
                 </div>
-                <button type="button" aria-label=${this.t('increase')} ?disabled=${this.preferences.textScale === 5} @click=${() => this.setScale(1)}>
+                <button type="button" aria-label=${this.t('increase')} ?disabled=${this.preferences.textScale === MAX_TEXT_SCALE} @click=${() => this.setScale(1)}>
                   ${icon('plus')}
                 </button>
               </div>
@@ -331,13 +428,19 @@ export class NanairoAccessibility extends LitElement {
               <span>${this.t('colorModes')}</span>
               <small>${this.t('colorModeHint')}</small>
             </div>
-            <div class="color-mode-grid" role="radiogroup" aria-label=${this.t('colorModes')}>
-              ${colorModes.map(({ value, label }) => html`
+            <div
+              class="color-mode-grid"
+              role="radiogroup"
+              aria-label=${this.t('colorModes')}
+              @keydown=${this.handleColorModeKeyDown}
+            >
+              ${COLOR_MODES.map(({ value, label }) => html`
                 <button
                   class="color-mode ${this.preferences.colorMode === value ? 'active' : ''}"
                   type="button"
                   role="radio"
                   aria-checked=${this.preferences.colorMode === value}
+                  tabindex=${this.preferences.colorMode === value ? 0 : -1}
                   @click=${() => this.setColorMode(value)}
                 >
                   <span class="color-swatch swatch-${value}" aria-hidden="true"><span></span></span>
@@ -381,18 +484,12 @@ export class NanairoAccessibility extends LitElement {
               </div>
               <button class="audit-button" type="button" @click=${this.runAudit}>${icon('audit')}<span>${this.t('auditRun')}</span></button>
               ${this.auditResult ? html`
-                <div class="audit-summary" role="status">
+                <div class="audit-summary">
                   <strong>${this.t('auditDone')}</strong>
-                  <span>${this.auditResult.warningCount}${this.t('auditWarnings')} · ${this.auditResult.manualCount}${this.t('auditManuals')}</span>
+                  <span>${this.auditResult.warningCount}${this.t('auditWarnings')}${SUMMARY_SEPARATOR}${this.auditResult.manualCount}${this.t('auditManuals')}</span>
                 </div>
-                <ul class="audit-results">
-                  ${this.auditResult.items.map((item) => html`
-                    <li class="status-${item.status}">
-                      <span class="audit-status" aria-hidden="true">${item.status === 'warning' ? '!' : item.status === 'manual' ? '?' : '✓'}</span>
-                      <span><strong>${item.label}</strong><small>${item.detail}${item.count > 0 ? ` (${item.count})` : ''}</small></span>
-                    </li>
-                  `)}
-                </ul>
+                ${this.renderAuditGroup('severe', 'auditSevere')}
+                ${this.renderAuditGroup('required', 'auditRequired')}
                 <p class="audit-disclaimer">${this.t('auditDisclaimer')}</p>
               ` : nothing}
             </div>
@@ -406,8 +503,8 @@ export class NanairoAccessibility extends LitElement {
                 .value=${this.locale}
                 @change=${(event: Event) => this.selectLocale((event.target as HTMLSelectElement).value as Locale)}
               >
-                <option value="ja">日本語</option>
-                <option value="en">English</option>
+                <option value="ja">${LANGUAGE_NAMES.ja}</option>
+                <option value="en">${LANGUAGE_NAMES.en}</option>
               </select>
             </div>
           </div>
@@ -602,11 +699,13 @@ export class NanairoAccessibility extends LitElement {
     .audit-button svg { width: 18px; height: 18px; }
     .audit-summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; margin-top: 14px; padding: 10px 12px; border-radius: 14px; color: var(--ink); background: var(--soft); font-size: 11px; }
     .audit-summary strong { font-size: 12px; }
-    .audit-results { display: grid; gap: 7px; margin: 10px 0 0; padding: 0; list-style: none; }
+    .audit-group { margin: 14px 0 0; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .02em; }
+    .audit-results { display: grid; gap: 7px; margin: 7px 0 0; padding: 0; list-style: none; }
     .audit-results li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px; align-items: start; padding: 9px; border: 1px solid var(--line); border-radius: 12px; }
     .audit-results strong, .audit-results small { display: block; }
     .audit-results strong { color: var(--ink); font-size: 11px; line-height: 1.5; }
     .audit-results small { margin-top: 2px; color: var(--muted); font-size: 10px; line-height: 1.55; }
+    .audit-note { font-style: italic; }
     .audit-status { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: #568477; font-size: 11px; font-weight: 800; }
     .status-warning .audit-status { background: #9a5b36; }
     .status-manual .audit-status { color: #4f5b58; background: #dce4e1; }

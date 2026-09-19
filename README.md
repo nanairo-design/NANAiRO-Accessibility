@@ -98,7 +98,22 @@ npm run build
 
 ビルド成果物は`dist/`へ生成されます。
 
+ページ全体のスタイル適用、カラーモードのコントラスト、キーボード操作、読み上げ、メディア制御は
+実ブラウザでの回帰テストで検証しています。
+
+```bash
+npx playwright install chromium   # 初回のみ
+npm run build
+npm run test:e2e
+```
+
+既にChromiumがある環境では`NANAIRO_E2E_CHROMIUM`へ実行ファイルのパスを指定できます。
+
 ## 配布ファイル
+
+配布物は`npm run package`で生成します。CDN版・WordPress版・npm版のバンドル、
+WordPress版に同梱するソース、`public/downloads/`の各アーカイブをまとめて更新するため、
+コードを変更したあとは必ず実行してください。
 
 - npm版：`public/downloads/nanairo-accessibility-0.1.0.tgz`
 - CDN／セルフホスト版：`public/downloads/nanairo-accessibility-cdn-0.1.0.zip`
