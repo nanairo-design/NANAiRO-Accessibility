@@ -48,7 +48,7 @@
 
 ## コンポーネントの使い方
 
-`section-intro` はセクション見出しに使用する。`eyebrow` は英語の補助ラベルで、必須情報は日本語にも記載する。手書き系ラベルには、プロジェクト内へ同梱したGoogle Fontsの「Reenie Beanie」を使用し、OSに依存せず同じ表情を保つ。
+`section-intro` はセクション見出しに使用する。`eyebrow` は英語の補助ラベルで、必須情報は日本語にも記載する。手書き系ラベルとツールフッターの `Powered by` には、プロジェクト内へ同梱したGoogle Fontsの「Reenie Beanie」を使用し、OSに依存せず同じ表情を保つ。
 
 `primary` は主要操作、`secondary` は関連情報への移動、`download-button` は実ファイルの取得に使う。主要ボタンは単色の青緑で、光沢・強い影・多色グラデーションを追加しない。最小高さ50px、デモCTAは56px。
 
