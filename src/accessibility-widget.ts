@@ -499,14 +499,14 @@ export class NanairoAccessibility extends LitElement {
     .launcher-mark { position: relative; width: 36px; height: 36px; display: grid; place-items: center; flex: none; color: var(--accent); border-radius: 50%; background: #fff; transition: opacity .18s ease, transform .28s ease; }
     .launcher-mark svg { width: 23px; height: 23px; stroke-width: 1.8; }
     .launcher-label { display: grid; justify-items: start; gap: 1px; font-size: 12px; font-weight: 800; letter-spacing: .05em; line-height: 1.08; text-align: left; writing-mode: horizontal-tb; transition: opacity .18s ease, transform .28s ease; }
-    .launcher-arrow { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: translateX(8px); transition: opacity .22s ease .12s, transform .36s cubic-bezier(.22,.8,.2,1) .08s; }
+    .launcher-arrow { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: scale(.82); transition: opacity .22s ease .12s, transform .36s cubic-bezier(.22,.8,.2,1) .08s; }
     .launcher-arrow svg { width: 24px; height: 24px; stroke-width: 1.7; }
     .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 46px; min-height: 62px; padding: 0; border-radius: 12px 0 0 12px; animation: none; }
     .launcher[aria-expanded="true"]:hover { width: 46px; }
     .launcher[aria-expanded="true"]:active { transform: translateY(-50%) scale(.97); }
     .launcher[aria-expanded="true"] .launcher-mark,
     .launcher[aria-expanded="true"] .launcher-label { opacity: 0; transform: scale(.84); }
-    .launcher[aria-expanded="true"] .launcher-arrow { opacity: 1; transform: translateX(0); }
+    .launcher[aria-expanded="true"] .launcher-arrow { opacity: 1; transform: scale(1); }
     :host([position="left"]) .launcher[aria-expanded="true"] { right: auto; left: var(--drawer-width); border-radius: 0 14px 14px 0; }
     :host([position="left"]) .launcher[aria-expanded="true"] .launcher-arrow { transform: scaleX(-1); }
 
@@ -527,13 +527,14 @@ export class NanairoAccessibility extends LitElement {
       background: #fff;
       box-shadow: -12px 0 40px rgba(34,41,54,.1);
       transform-origin: center right;
+      visibility: hidden;
       pointer-events: none;
       opacity: 0;
       transform: translateX(100%);
-      transition: transform .48s cubic-bezier(.22,.8,.2,1), opacity .34s ease;
+      transition: transform .48s cubic-bezier(.22,.8,.2,1), opacity .34s ease, visibility 0s linear .48s;
     }
 
-    .panel.is-open { pointer-events: auto; opacity: 1; transform: translateX(0); }
+    .panel.is-open { visibility: visible; pointer-events: auto; opacity: 1; transform: translateX(0); transition-delay: 0s; }
     :host([position="left"]) .panel { right: auto; left: 0; border-radius: 0 var(--radius) var(--radius) 0; transform: translateX(-100%); }
     :host([position="left"]) .panel.is-open { transform: translateX(0); }
 
