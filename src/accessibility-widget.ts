@@ -1,4 +1,4 @@
-import { LitElement, css, html, nothing, svg, type PropertyValues } from 'lit';
+import { LitElement, css, html, nothing, svg, unsafeCSS, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { normalizeLocale, translate, type Locale, type MessageKey } from './i18n';
 import { applyPageEffects, destroyPageEffects } from './page-effects';
@@ -7,6 +7,7 @@ import { collectSpeechSegments } from './speech';
 import { MAX_TEXT_SCALE, defaultPreferences, loadPreferences, savePreferences, type ColorMode, type Preferences } from './state';
 import logoMarkUrl from './assets/nanairo-logo-mark.png?inline';
 import logoHorizontalUrl from './assets/nanairo-logo-horizontal.png?inline';
+import reenieBeanieUrl from './assets/reenie-beanie-regular.woff2?inline';
 
 let instanceCount = 0;
 
@@ -524,6 +525,14 @@ export class NanairoAccessibility extends LitElement {
   }
 
   static styles = css`
+    @font-face {
+      font-family: "Reenie Beanie";
+      src: url(${unsafeCSS(reenieBeanieUrl)}) format("woff2");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
     :host {
       --accent: #397579;
       --accent-hover: #285c60;
@@ -587,14 +596,14 @@ export class NanairoAccessibility extends LitElement {
     .launcher-mark { position: relative; width: 36px; height: 36px; display: grid; place-items: center; flex: none; color: var(--accent); border-radius: 50%; background: #fff; transition: opacity .18s ease, transform .28s ease; }
     .launcher-mark svg { width: 23px; height: 23px; stroke-width: 1.8; }
     .launcher-label { display: grid; justify-items: start; gap: 1px; font-size: 12px; font-weight: 800; letter-spacing: .05em; line-height: 1.08; text-align: left; writing-mode: horizontal-tb; transition: opacity .18s ease, transform .28s ease; }
-    .launcher-arrow { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: translateX(8px); transition: opacity .22s ease .12s, transform .36s cubic-bezier(.22,.8,.2,1) .08s; }
+    .launcher-arrow { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: scale(.82); transition: opacity .22s ease .12s, transform .36s cubic-bezier(.22,.8,.2,1) .08s; }
     .launcher-arrow svg { width: 24px; height: 24px; stroke-width: 1.7; }
     .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 46px; min-height: 62px; padding: 0; border-radius: 12px 0 0 12px; animation: none; }
     .launcher[aria-expanded="true"]:hover { width: 46px; }
     .launcher[aria-expanded="true"]:active { transform: translateY(-50%) scale(.97); }
     .launcher[aria-expanded="true"] .launcher-mark,
     .launcher[aria-expanded="true"] .launcher-label { opacity: 0; transform: scale(.84); }
-    .launcher[aria-expanded="true"] .launcher-arrow { opacity: 1; transform: translateX(0); }
+    .launcher[aria-expanded="true"] .launcher-arrow { opacity: 1; transform: scale(1); }
     :host([position="left"]) .launcher[aria-expanded="true"] { right: auto; left: var(--drawer-width); border-radius: 0 14px 14px 0; }
     :host([position="left"]) .launcher[aria-expanded="true"] .launcher-arrow { transform: scaleX(-1); }
 
@@ -615,13 +624,14 @@ export class NanairoAccessibility extends LitElement {
       background: #fff;
       box-shadow: -12px 0 40px rgba(34,41,54,.1);
       transform-origin: center right;
+      visibility: hidden;
       pointer-events: none;
       opacity: 0;
       transform: translateX(100%);
-      transition: transform .48s cubic-bezier(.22,.8,.2,1), opacity .34s ease;
+      transition: transform .48s cubic-bezier(.22,.8,.2,1), opacity .34s ease, visibility 0s linear .48s;
     }
 
-    .panel.is-open { pointer-events: auto; opacity: 1; transform: translateX(0); }
+    .panel.is-open { visibility: visible; pointer-events: auto; opacity: 1; transform: translateX(0); transition-delay: 0s; }
     :host([position="left"]) .panel { right: auto; left: 0; border-radius: 0 var(--radius) var(--radius) 0; transform: translateX(-100%); }
     :host([position="left"]) .panel.is-open { transform: translateX(0); }
 
@@ -715,7 +725,7 @@ export class NanairoAccessibility extends LitElement {
     .reset-button:hover { color: var(--accent-hover); border-color: var(--accent); background: var(--soft); }
     .reset-button svg { width: 17px; height: 17px; }
     .footer-brand { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); white-space: nowrap; }
-    .powered-by { font-size: 10px; font-weight: 650; letter-spacing: .04em; }
+    .powered-by { color: #6b7280; font-family: "Reenie Beanie", cursive; font-size: 18px; font-weight: 400; letter-spacing: normal; line-height: 1; }
     .footer-brand img { width: 72px; height: auto; object-fit: contain; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
