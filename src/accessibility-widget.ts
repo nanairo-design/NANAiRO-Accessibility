@@ -626,7 +626,7 @@ export class NanairoAccessibility extends LitElement {
     .reset-button:hover { color: var(--accent-hover); border-color: var(--accent); background: var(--soft); }
     .reset-button svg { width: 17px; height: 17px; }
     .footer-brand { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); white-space: nowrap; }
-    .powered-by { font-family: "Reenie Beanie", cursive; font-size: 18px; font-weight: 400; letter-spacing: .01em; line-height: 1; }
+    .powered-by { color: #6b7280; font-family: "Reenie Beanie", cursive; font-size: 18px; font-weight: 400; letter-spacing: normal; line-height: 1; }
     .footer-brand img { width: 72px; height: auto; object-fit: contain; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
