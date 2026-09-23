@@ -1,4 +1,11 @@
 /* NANAiRO editorial design. Rules and rationale: DESIGN.md */
+@font-face {
+  font-family: "Reenie Beanie";
+  src: url("/assets/fonts/reenie-beanie/ReenieBeanie-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
 :root {
   --ink: #222936;
   --muted: #606975;
@@ -71,7 +78,7 @@ h1 { margin: 0 0 18px; font-size: clamp(32px, 3.65vw, 48px); font-weight: 750; l
 .section-intro { max-width: 700px; display: flex; flex-direction: column; align-items: center; text-align: center; margin: 0 auto 44px; }
 .section h2 { margin: 0 0 14px; font-size: clamp(26px, 3vw, 36px); line-height: 1.6; letter-spacing: -.03em; }
 .section-intro h2 { order: 0; }
-.section-intro .eyebrow { order: 1; font-family: "Bradley Hand", "Segoe Print", cursive; font-size: 21px; letter-spacing: .01em; font-weight: 400; }
+.section-intro .eyebrow { order: 1; font-family: "Reenie Beanie", cursive; font-size: 30px; letter-spacing: .01em; line-height: 1.1; font-weight: 400; }
 .section-intro p { order: 2; margin: 22px 0 0; font-size: 15px; color: var(--muted); line-height: 2; }
 .mission-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 72px; align-items: center; }
 .mission-statement { padding: 48px 38px; border-radius: var(--radius); background: #f2f6f3; }
