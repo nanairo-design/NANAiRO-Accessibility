@@ -303,7 +303,12 @@ async function main() {
   await page.waitForSelector('nanairo-accessibility', { state: 'attached' });
   await openPanel(page);
   check('rounds a fractional text scale', (await page.getAttribute('html', 'data-nanairo-text-scale')) === '3');
-  check('applies the rounded scale', (await page.evaluate(() => getComputedStyle(document.documentElement).fontSize)) === '24px');
+  // Scaling is per element rather than on the root, so px-sized content grows too.
+  check(
+    'applies the rounded scale',
+    (await page.evaluate(() => getComputedStyle(document.querySelector('main p')).fontSize)) === '24px',
+    await page.evaluate(() => getComputedStyle(document.querySelector('main p')).fontSize),
+  );
   check('shows a real percentage', (await shadow(page).locator('output').textContent())?.trim() === '150%');
   check('ignores a non-boolean toggle', (await page.getAttribute('html', 'data-nanairo-spacing')) === 'default');
   await shadow(page).locator('.preference-row', { hasText: 'ゆったり表示' }).click();

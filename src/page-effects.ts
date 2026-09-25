@@ -5,12 +5,6 @@ const GUIDE_ID = 'nanairo-a11y-reading-guide';
 const MASK_ID = 'nanairo-a11y-reading-mask';
 
 const PAGE_STYLES = `
-html[data-nanairo-text-scale="1"] { font-size: 112.5%; }
-html[data-nanairo-text-scale="2"] { font-size: 125%; }
-html[data-nanairo-text-scale="3"] { font-size: 150%; }
-html[data-nanairo-text-scale="4"] { font-size: 175%; }
-html[data-nanairo-text-scale="5"] { font-size: 200%; }
-
 html[data-nanairo-spacing="comfortable"] body :where(p, li, dd, dt, blockquote, figcaption, label, input, textarea, button) {
   line-height: 1.8 !important;
   letter-spacing: 0.055em !important;
@@ -203,6 +197,46 @@ interface MediaState {
 let pointerListenerAttached = false;
 let mediaObserver: MutationObserver | undefined;
 const mediaStates = new Map<HTMLMediaElement, MediaState>();
+const textScaleFactors = [1, 1.125, 1.25, 1.5, 1.75, 2] as const;
+const textScaleSelector = 'h1, h2, h3, h4, h5, h6, p, li, dt, dd, figcaption, label, a, button, input, select, textarea, summary, blockquote, th, td, legend, output, span, strong, small, code, pre';
+const textStyles = new Map<HTMLElement, { baseSize: number; inlineValue: string; inlinePriority: string }>();
+
+function shouldScaleText(element: HTMLElement): boolean {
+  if (element.closest('nanairo-accessibility')) return false;
+  if (element.id === GUIDE_ID || element.id === MASK_ID) return false;
+  if (element.matches('input, select, textarea')) return true;
+  return Array.from(element.childNodes).some((node) => node.nodeType === Node.TEXT_NODE && Boolean(node.textContent?.trim()));
+}
+
+function restoreTextSizes(): void {
+  textStyles.forEach(({ inlineValue, inlinePriority }, element) => {
+    if (inlineValue) element.style.setProperty('font-size', inlineValue, inlinePriority);
+    else element.style.removeProperty('font-size');
+  });
+  textStyles.clear();
+}
+
+function setTextScale(level: number): void {
+  const factor = textScaleFactors[Math.max(0, Math.min(5, level))] ?? 1;
+  if (factor === 1) {
+    restoreTextSizes();
+    return;
+  }
+
+  const targets = Array.from(document.querySelectorAll<HTMLElement>(textScaleSelector)).filter(shouldScaleText);
+  targets.forEach((element) => {
+    if (textStyles.has(element)) return;
+    textStyles.set(element, {
+      baseSize: Number.parseFloat(getComputedStyle(element).fontSize),
+      inlineValue: element.style.getPropertyValue('font-size'),
+      inlinePriority: element.style.getPropertyPriority('font-size'),
+    });
+  });
+
+  textStyles.forEach(({ baseSize }, element) => {
+    if (element.isConnected) element.style.setProperty('font-size', `${baseSize * factor}px`, 'important');
+  });
+}
 
 function ensureStyles(): void {
   if (!document.head || document.getElementById(STYLE_ID)) return;
@@ -304,8 +338,14 @@ const EFFECT_DATA_KEYS = [
 export function withPageEffectsSuspended<T>(measure: () => T): T {
   const root = document.documentElement;
   const saved = EFFECT_DATA_KEYS.map((key) => [key, root.dataset[key]] as const);
+  const savedScale = Number.parseInt(root.dataset.nanairoTextScale ?? '', 10);
 
   for (const [key] of saved) delete root.dataset[key];
+  // The text scale is applied as an inline font-size, not through the data
+  // attributes, so dropping those alone would leave the enlarged sizes in
+  // place and a 9px caption would measure as 18px: no small-text warning, and
+  // the wrong contrast threshold.
+  restoreTextSizes();
   try {
     // Style resolution is synchronous on query, so getComputedStyle inside
     // `measure` already reflects the suspension.
@@ -315,6 +355,7 @@ export function withPageEffectsSuspended<T>(measure: () => T): T {
       if (value === undefined) delete root.dataset[key];
       else root.dataset[key] = value;
     }
+    if (Number.isInteger(savedScale) && savedScale > 0) setTextScale(savedScale);
   }
 }
 
@@ -324,6 +365,7 @@ export function applyPageEffects(preferences: Preferences): void {
   const root = document.documentElement;
 
   root.dataset.nanairoTextScale = String(preferences.textScale);
+  setTextScale(preferences.textScale);
   root.dataset.nanairoSpacing = preferences.comfortableSpacing ? 'comfortable' : 'default';
   root.dataset.nanairoLinks = preferences.highlightLinks ? 'highlight' : 'default';
   const colorMode = preferences.colorMode === 'default' && preferences.highContrast
@@ -352,6 +394,7 @@ export function applyPageEffects(preferences: Preferences): void {
 
 export function destroyPageEffects(): void {
   const root = document.documentElement;
+  restoreTextSizes();
   delete root.dataset.nanairoTextScale;
   delete root.dataset.nanairoSpacing;
   delete root.dataset.nanairoLinks;

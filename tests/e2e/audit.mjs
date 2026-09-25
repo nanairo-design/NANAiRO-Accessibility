@@ -73,6 +73,22 @@ const CLEAN_PAGE = `<!doctype html>
 </body></html>
 `;
 
+/** Text below 10px, which the audit reports under "\u6587\u5b57\u30b3\u30fc\u30c9\u3068\u30d5\u30a9\u30f3\u30c8". */
+const SMALL_TEXT_PAGE = `<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>\u6ce8\u8a18 | \u691c\u8a3c\u30b5\u30a4\u30c8</title>
+<style>body { background: #fff; color: #222; } .tiny { font-size: 9px; }</style>
+</head><body>
+<main>
+  <h1>\u6ce8\u8a18\u306e\u3042\u308b\u30da\u30fc\u30b8</h1>
+  <p>\u672c\u6587\u3067\u3059\u3002</p>
+  <p class="tiny">\u6975\u7aef\u306b\u5c0f\u3055\u3044\u6ce8\u8a18\u3067\u3059\u3002</p>
+</main>
+<script src="./${BUNDLE}" data-nanairo-auto data-locale="ja" defer></script>
+</body></html>
+`;
+
 /** Zoom capped below 200%, which 1.4.4 does not allow. */
 const ZOOM_PAGE = `<!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
@@ -121,6 +137,7 @@ async function main() {
   writeFileSync(join(workdir, 'defects.html'), DEFECTS_PAGE);
   writeFileSync(join(workdir, 'clean.html'), CLEAN_PAGE);
   writeFileSync(join(workdir, 'zoom.html'), ZOOM_PAGE);
+  writeFileSync(join(workdir, 'small-text.html'), SMALL_TEXT_PAGE);
   // Same markup as clean.html, served and labelled as Shift_JIS.
   writeFileSync(join(workdir, 'sjis.html'), CLEAN_PAGE.replace('<meta charset="utf-8">', '<meta charset="Shift_JIS">'));
   const url = (file) => `file://${join(workdir, file)}`;
@@ -247,6 +264,41 @@ async function main() {
   check(
     'an encoding other than UTF-8 is reported',
     byLabel((await readAudit(sjis)).items, '文字コード')?.status === 'warning',
+  );
+
+  // ---- the text scale must not hide a small-text problem -------------------
+  console.log('\ntext scale is suspended for the audit');
+  const small = await load('small-text.html');
+  await openPanel(small);
+  await runAudit(small);
+  check(
+    'sub-10px text is reported',
+    byLabel((await readAudit(small)).items, '\u6587\u5b57\u30b3\u30fc\u30c9')?.status === 'warning',
+    JSON.stringify(byLabel((await readAudit(small)).items, '\u6587\u5b57\u30b3\u30fc\u30c9')),
+  );
+  // The scale is applied as an inline font-size, so an audit that only cleared
+  // the data attributes would measure 18px and call the page clean.
+  const increase = widget(small).locator('.stepper button[aria-label="\u6587\u5b57\u3092\u5927\u304d\u304f\u3059\u308b"]');
+  while (!(await increase.isDisabled())) {
+    await increase.click();
+    await small.waitForTimeout(120);
+  }
+  await small.waitForTimeout(300);
+  check(
+    'the scale really is applied',
+    (await small.evaluate(() => getComputedStyle(document.querySelector('.tiny')).fontSize)) === '18px',
+    await small.evaluate(() => getComputedStyle(document.querySelector('.tiny')).fontSize),
+  );
+  await runAudit(small);
+  check(
+    'still reported at 200% text',
+    byLabel((await readAudit(small)).items, '\u6587\u5b57\u30b3\u30fc\u30c9')?.status === 'warning',
+    JSON.stringify(byLabel((await readAudit(small)).items, '\u6587\u5b57\u30b3\u30fc\u30c9')),
+  );
+  check(
+    'the enlarged size is restored after the audit',
+    (await small.evaluate(() => getComputedStyle(document.querySelector('.tiny')).fontSize)) === '18px',
+    await small.evaluate(() => getComputedStyle(document.querySelector('.tiny')).fontSize),
   );
 
   // ---- zoom ----------------------------------------------------------------
