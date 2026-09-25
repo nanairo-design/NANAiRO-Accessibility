@@ -231,6 +231,26 @@ html[data-nanairo-color="dark"] .demo-icon {
   .install-notes { gap: 18px; }
   .callout { padding: 36px 24px; }
   body > footer { flex-direction: column; text-align: center; }
+  html[data-nanairo-text-scale="3"] .meaning-list li,
+  html[data-nanairo-text-scale="4"] .meaning-list li,
+  html[data-nanairo-text-scale="5"] .meaning-list li,
+  html[data-nanairo-text-scale="3"] .bar-chart li,
+  html[data-nanairo-text-scale="4"] .bar-chart li,
+  html[data-nanairo-text-scale="5"] .bar-chart li {
+    grid-template-columns: 1fr;
+  }
+  html[data-nanairo-text-scale="3"] :is(.adoption-highlight, .beneficiary-highlight),
+  html[data-nanairo-text-scale="4"] :is(.adoption-highlight, .beneficiary-highlight),
+  html[data-nanairo-text-scale="5"] :is(.adoption-highlight, .beneficiary-highlight) {
+    flex-wrap: wrap;
+  }
+  html[data-nanairo-text-scale="3"] .bar-chart li > strong,
+  html[data-nanairo-text-scale="4"] .bar-chart li > strong,
+  html[data-nanairo-text-scale="5"] .bar-chart li > strong {
+    white-space: normal;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
