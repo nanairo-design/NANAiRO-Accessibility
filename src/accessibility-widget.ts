@@ -289,13 +289,14 @@ export class NanairoAccessibility extends LitElement {
               <span class="brand-mark" aria-hidden="true"><img src=${logoMarkUrl} alt="" /></span>
               <span>
                 <strong id="nanairo-panel-title">${this.t('title')}</strong>
+                <small class="brand-subtitle">${this.t('subtitle')}</small>
                 <a
                   class="accessibility-tag"
                   href="https://nanairo.design/accessibility-tools"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <span>${this.t('subtitle')}</span>${icon('external')}
+                  <span>${this.t('accessibilityCta')}</span>${icon('external')}
                 </a>
               </span>
             </div>
@@ -426,7 +427,7 @@ export class NanairoAccessibility extends LitElement {
             ${this.showBranding ? html`
               <a
                 class="footer-brand"
-                href="https://nanairo.design/accessibility-tools"
+                href="https://nanairo.design/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="NANAiRO accessibility tools"
@@ -558,9 +559,10 @@ export class NanairoAccessibility extends LitElement {
     .brand-mark, .feature-icon { display: grid; place-items: center; flex: none; }
     .brand-mark { width: 44px; height: 44px; padding: 5px; }
     .brand-mark img { display: block; width: 100%; height: 100%; object-fit: contain; }
-    .brand strong { display: block; }
+    .brand strong, .brand-subtitle { display: block; }
     .brand strong { font-size: 18px; line-height: 1.25; letter-spacing: -.02em; }
-    .accessibility-tag { width: fit-content; display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; padding: 5px 9px; color: #285c60; border: 1px solid #b9d2ca; border-radius: 9999px; background: #edf5f2; font-size: 10px; font-weight: 700; line-height: 1.35; text-decoration: none; overflow-wrap: anywhere; transition: color .2s ease, border-color .2s ease, background .2s ease; }
+    .brand-subtitle { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
+    .accessibility-tag { width: fit-content; display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; padding: 5px 9px; color: #285c60; border: 1px solid #b9d2ca; border-radius: 9999px; background: #edf5f2; font-size: 10px; font-weight: 700; line-height: 1.35; text-decoration: none; overflow-wrap: anywhere; transition: color .2s ease, border-color .2s ease, background .2s ease; }
     .accessibility-tag:hover { color: #fff; border-color: var(--accent); background: var(--accent); }
     .accessibility-tag svg { width: 13px; height: 13px; flex: none; stroke-width: 1.9; }
 
@@ -684,7 +686,7 @@ export class NanairoAccessibility extends LitElement {
     @media (prefers-contrast: more) {
       .panel { border: 2px solid #182233; background: #fff; box-shadow: 0 14px 40px rgba(0,0,0,.25); backdrop-filter: none; }
       .scale-card, .preference-group { border-color: #677386; background: #fff; }
-      .preference-hint, .note { color: #4b5565; }
+      .preference-hint, .note, .brand-subtitle { color: #4b5565; }
     }
 
     @media (prefers-reduced-transparency: reduce) {
