@@ -250,8 +250,8 @@ export class NanairoAccessibility extends LitElement {
     const scalePercent = [100, 112, 125, 150, 175, 200][this.preferences.textScale];
     const colorModes = [
       { value: 'default', label: 'colorDefault' },
-      { value: 'dark', label: 'colorDark' },
       { value: 'light', label: 'colorLight' },
+      { value: 'dark', label: 'colorDark' },
       { value: 'high-contrast', label: 'colorHighContrast' },
       { value: 'monochrome', label: 'colorMonochrome' },
       { value: 'saturated', label: 'colorSaturated' },
@@ -456,8 +456,12 @@ export class NanairoAccessibility extends LitElement {
       --accent-hover: #285c60;
       --ink: #222936;
       --muted: #606975;
-      --line: #e8ebeb;
-      --soft: #f5f7f7;
+      --line: rgba(84, 104, 110, .18);
+      --soft: rgba(245, 249, 248, .62);
+      --glass: rgba(255, 255, 255, .68);
+      --glass-strong: rgba(255, 255, 255, .82);
+      --glass-line: rgba(255, 255, 255, .78);
+      --glass-shadow: rgba(31, 45, 51, .16);
       --radius: 24px;
       --drawer-width: min(420px, calc(100vw - 46px));
       position: fixed;
@@ -494,11 +498,13 @@ export class NanairoAccessibility extends LitElement {
       overflow: hidden;
       cursor: pointer;
       color: white;
-      border: 1px solid var(--accent);
+      border: 1px solid rgba(255,255,255,.48);
       border-right: 0;
       border-radius: 13px 0 0 13px;
-      background: var(--accent);
-      box-shadow: 0 4px 16px rgba(34,41,54,.12);
+      background: linear-gradient(145deg, rgba(68,135,137,.94), rgba(42,96,100,.9));
+      box-shadow: 0 12px 32px rgba(24,55,58,.2), inset 0 1px 0 rgba(255,255,255,.32);
+      -webkit-backdrop-filter: blur(22px) saturate(165%);
+      backdrop-filter: blur(22px) saturate(165%);
       transform: translateY(-50%);
       transition: right .48s cubic-bezier(.22,.8,.2,1), left .48s cubic-bezier(.22,.8,.2,1), width .42s cubic-bezier(.22,.8,.2,1), min-height .42s cubic-bezier(.22,.8,.2,1), padding .42s ease, border-radius .42s ease, box-shadow .42s ease, filter .28s ease;
       animation: launcher-invite 1.8s ease-out 1s 2;
@@ -506,7 +512,7 @@ export class NanairoAccessibility extends LitElement {
 
     :host([position="left"]) .launcher { right: auto; left: 0; border-right: 1px solid var(--accent); border-left: 0; border-radius: 0 13px 13px 0; }
     :host([position="left"]) .launcher { animation-name: launcher-invite-left; }
-    .launcher:hover { width: 130px; background: var(--accent-hover); }
+    .launcher:hover { width: 130px; background: linear-gradient(145deg, rgba(72,143,145,.98), rgba(38,88,92,.96)); }
     .launcher:active { transform: translateY(-50%) scale(.97); }
     .launcher:focus-visible, button:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
     .launcher:focus-visible { outline-offset: -4px; outline-color: #fff; }
@@ -537,10 +543,12 @@ export class NanairoAccessibility extends LitElement {
       grid-template-rows: auto minmax(0, 1fr) auto;
       overflow: hidden;
       isolation: isolate;
-      border: 1px solid var(--line);
+      border: 1px solid var(--glass-line);
       border-radius: var(--radius) 0 0 var(--radius);
-      background: #fff;
-      box-shadow: -12px 0 40px rgba(34,41,54,.1);
+      background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(244,250,248,.62));
+      box-shadow: -20px 0 56px var(--glass-shadow), inset 1px 0 0 rgba(255,255,255,.88);
+      -webkit-backdrop-filter: blur(34px) saturate(175%);
+      backdrop-filter: blur(34px) saturate(175%);
       transform-origin: center right;
       visibility: hidden;
       pointer-events: none;
@@ -553,7 +561,8 @@ export class NanairoAccessibility extends LitElement {
     :host([position="left"]) .panel { right: auto; left: 0; border-radius: 0 var(--radius) var(--radius) 0; transform: translateX(-100%); }
     :host([position="left"]) .panel.is-open { transform: translateX(0); }
 
-    .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 24px 20px; border-bottom: 1px solid var(--line); }
+    .panel::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(135deg, rgba(255,255,255,.42), transparent 34%, rgba(126,185,177,.08) 78%, rgba(255,255,255,.22)); }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,.72); background: rgba(255,255,255,.36); -webkit-backdrop-filter: blur(24px) saturate(150%); backdrop-filter: blur(24px) saturate(150%); }
     .brand { min-width: 0; display: flex; align-items: center; gap: 12px; }
     .brand > span:last-child { min-width: 0; }
     .brand-mark, .feature-icon { display: grid; place-items: center; flex: none; }
@@ -562,21 +571,21 @@ export class NanairoAccessibility extends LitElement {
     .brand strong, .brand-subtitle { display: block; }
     .brand strong { font-size: 18px; line-height: 1.25; letter-spacing: -.02em; }
     .brand-subtitle { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
-    .accessibility-tag { width: fit-content; display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; padding: 5px 9px; color: #285c60; border: 1px solid #b9d2ca; border-radius: 9999px; background: #edf5f2; font-size: 10px; font-weight: 700; line-height: 1.35; text-decoration: none; overflow-wrap: anywhere; transition: color .2s ease, border-color .2s ease, background .2s ease; }
+    .accessibility-tag { width: fit-content; display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; padding: 5px 9px; color: #285c60; border: 1px solid rgba(132,178,170,.48); border-radius: 9999px; background: rgba(236,247,244,.66); box-shadow: inset 0 1px 0 rgba(255,255,255,.74); font-size: 10px; font-weight: 700; line-height: 1.35; text-decoration: none; overflow-wrap: anywhere; transition: color .2s ease, border-color .2s ease, background .2s ease; }
     .accessibility-tag:hover { color: #fff; border-color: var(--accent); background: var(--accent); }
     .accessibility-tag svg { width: 13px; height: 13px; flex: none; stroke-width: 1.9; }
 
-    .icon-button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; flex: none; cursor: pointer; color: var(--ink); border: 1px solid var(--line); border-radius: 50%; background: #fff; }
+    .icon-button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; flex: none; cursor: pointer; color: var(--ink); border: 1px solid rgba(255,255,255,.82); border-radius: 50%; background: rgba(255,255,255,.58); box-shadow: 0 8px 18px rgba(31,45,51,.08), inset 0 1px 0 rgba(255,255,255,.9); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
     .icon-button:hover { background: var(--soft); border-color: var(--accent); }
     .icon-button svg { width: 20px; height: 20px; }
 
-    .panel-scroll { min-height: 0; overflow-y: auto; padding: 16px 16px 12px; scrollbar-width: thin; scrollbar-color: rgba(90,107,137,.25) transparent; }
-    .language-field { display: grid; grid-template-columns: 1fr minmax(132px, auto); align-items: center; gap: 14px; margin: 20px 0 4px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+    .panel-scroll { min-height: 0; overflow-y: auto; padding: 16px 16px 12px; background: rgba(245,250,248,.16); scrollbar-width: thin; scrollbar-color: rgba(90,107,137,.25) transparent; }
+    .language-field { display: grid; grid-template-columns: 1fr minmax(132px, auto); align-items: center; gap: 14px; margin: 20px 0 4px; padding: 14px; border: 1px solid var(--glass-line); border-radius: var(--radius); background: var(--glass); box-shadow: 0 10px 24px rgba(31,45,51,.06), inset 0 1px 0 rgba(255,255,255,.82); -webkit-backdrop-filter: blur(18px) saturate(145%); backdrop-filter: blur(18px) saturate(145%); }
     .language-field label { color: var(--ink); font-size: 12px; font-weight: 700; }
     .language-field select { min-height: 44px; max-width: 100%; padding: 7px 28px 7px 12px; cursor: pointer; color: var(--ink); border: 1px solid var(--line); border-radius: 9999px; background: var(--soft); font: inherit; font-size: 13px; font-weight: 700; }
 
     .section-heading { margin: 0 4px 10px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; }
-    .scale-card, .preference-group { border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+    .scale-card, .preference-group { border: 1px solid var(--glass-line); border-radius: var(--radius); background: var(--glass); box-shadow: 0 12px 26px rgba(31,45,51,.065), inset 0 1px 0 rgba(255,255,255,.84); -webkit-backdrop-filter: blur(18px) saturate(145%); backdrop-filter: blur(18px) saturate(145%); }
     .scale-card { padding: 15px; margin-bottom: 10px; }
     .scale-heading { display: flex; align-items: center; gap: 11px; }
     .feature-icon { width: 38px; height: 38px; color: var(--accent); border-radius: 50%; background: var(--soft); }
@@ -588,7 +597,7 @@ export class NanairoAccessibility extends LitElement {
     output { color: var(--accent); font-size: 13px; font-weight: 750; font-variant-numeric: tabular-nums; }
 
     .stepper { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 12px; margin-top: 14px; }
-    .stepper button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; cursor: pointer; color: var(--accent); border: 1px solid var(--line); border-radius: 50%; background: var(--soft); }
+    .stepper button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; cursor: pointer; color: var(--accent); border: 1px solid rgba(255,255,255,.8); border-radius: 50%; background: rgba(247,250,249,.62); box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 5px 14px rgba(31,45,51,.05); }
     .stepper button:hover:not(:disabled) { background: white; transform: translateY(-1px); }
     .stepper button:disabled { cursor: not-allowed; opacity: .34; }
     .stepper button svg { width: 18px; height: 18px; }
@@ -609,11 +618,11 @@ export class NanairoAccessibility extends LitElement {
     .color-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 4px 10px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; }
     .color-heading small { font-size: 11px; font-weight: 550; letter-spacing: 0; }
     .color-mode-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-bottom: 18px; }
-    .color-mode { min-width: 0; min-height: 64px; display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 7px; padding: 8px; cursor: pointer; color: var(--ink); border: 1px solid var(--line); border-radius: 16px; background: #fff; font-size: 11px; font-weight: 700; line-height: 1.5; text-align: left; transition: border-color .2s ease, background .2s ease; }
-    .color-mode:hover { border-color: var(--accent); background: var(--soft); }
+    .color-mode { min-width: 0; min-height: 64px; display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 7px; padding: 8px; cursor: pointer; color: var(--ink); border: 1px solid var(--glass-line); border-radius: 16px; background: rgba(255,255,255,.54); box-shadow: inset 0 1px 0 rgba(255,255,255,.78); font-size: 11px; font-weight: 700; line-height: 1.5; text-align: left; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+    .color-mode:hover { border-color: rgba(57,117,121,.48); background: rgba(255,255,255,.76); transform: translateY(-1px); }
     .color-mode.active { color: var(--accent-hover); border-color: var(--accent); background: #edf4f3; box-shadow: inset 0 0 0 1px var(--accent); }
-    .color-swatch { width: 22px; height: 22px; display: block; padding: 3px; border: 1px solid rgba(38,53,51,.17); border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(31,43,69,.1); }
-    .color-swatch span { display: block; width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #9dcc47, #21aaa0); }
+    .color-swatch { width: 22px; height: 22px; display: block; padding: 3px; border: 1px solid rgba(255,255,255,.8); border-radius: 50%; background: rgba(255,255,255,.52); box-shadow: 0 4px 9px rgba(31,43,69,.12), inset 0 1px 0 rgba(255,255,255,.9); }
+    .color-swatch span { display: block; width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,.94), rgba(145,202,193,.74)); box-shadow: inset 0 0 0 1px rgba(57,117,121,.2); }
     .swatch-dark { background: #181b1a; border-color: #181b1a; }
     .swatch-dark span { background: #a2e6cc; }
     .swatch-light span { background: #fff; border: 1px solid #737a78; }
@@ -623,7 +632,7 @@ export class NanairoAccessibility extends LitElement {
     .swatch-saturated span { background: conic-gradient(#ff365f, #ffd600, #13bd68, #1c91ff, #9f45ff, #ff365f); }
 
     .note { margin: 2px 6px 6px; color: var(--muted); font-size: 12px; line-height: 1.7; }
-    .audit-card { margin-bottom: 18px; padding: 15px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+    .audit-card { margin-bottom: 18px; padding: 15px; border: 1px solid var(--glass-line); border-radius: var(--radius); background: var(--glass); box-shadow: 0 12px 26px rgba(31,45,51,.06), inset 0 1px 0 rgba(255,255,255,.84); -webkit-backdrop-filter: blur(18px) saturate(145%); backdrop-filter: blur(18px) saturate(145%); }
     .audit-heading { display: flex; align-items: center; gap: 11px; }
     .audit-button { width: 100%; min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; padding: 10px 16px; cursor: pointer; color: #fff; border: 1px solid var(--accent); border-radius: 9999px; background: var(--accent); font-size: 13px; font-weight: 700; }
     .audit-button:hover { background: var(--accent-hover); }
@@ -639,8 +648,8 @@ export class NanairoAccessibility extends LitElement {
     .status-warning .audit-status { background: #9a5b36; }
     .status-manual .audit-status { color: #4f5b58; background: #dce4e1; }
     .audit-disclaimer { margin: 10px 2px 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
-    .panel-footer { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 16px; border-top: 1px solid var(--line); background: #fff; }
-    .reset-button { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 9px 14px; cursor: pointer; color: var(--ink); border: 1px solid var(--line); border-radius: 9999px; background: #fff; font-size: 12px; font-weight: 650; }
+    .panel-footer { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 16px; border-top: 1px solid rgba(255,255,255,.72); background: rgba(255,255,255,.42); -webkit-backdrop-filter: blur(26px) saturate(155%); backdrop-filter: blur(26px) saturate(155%); }
+    .reset-button { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 9px 14px; cursor: pointer; color: var(--ink); border: 1px solid rgba(255,255,255,.82); border-radius: 9999px; background: rgba(255,255,255,.58); box-shadow: inset 0 1px 0 rgba(255,255,255,.9); font-size: 12px; font-weight: 650; }
     .reset-button:hover { color: var(--accent-hover); border-color: var(--accent); background: var(--soft); }
     .reset-button svg { width: 17px; height: 17px; }
     .footer-brand { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); text-decoration: none; white-space: nowrap; border-radius: 8px; }
@@ -685,13 +694,13 @@ export class NanairoAccessibility extends LitElement {
 
     @media (prefers-contrast: more) {
       .panel { border: 2px solid #182233; background: #fff; box-shadow: 0 14px 40px rgba(0,0,0,.25); backdrop-filter: none; }
-      .scale-card, .preference-group { border-color: #677386; background: #fff; }
+      .scale-card, .preference-group, .language-field, .audit-card { border-color: #677386; background: #fff; }
       .preference-hint, .note, .brand-subtitle { color: #4b5565; }
     }
 
     @media (prefers-reduced-transparency: reduce) {
-      .panel, .launcher { backdrop-filter: none; -webkit-backdrop-filter: none; }
-      .panel { background: #fff; }
+      .panel, .launcher, .panel-header, .panel-footer, .scale-card, .preference-group, .language-field, .audit-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
+      .panel, .panel-header, .panel-footer, .scale-card, .preference-group, .language-field, .audit-card { background: #fff; }
     }
   `;
 }
