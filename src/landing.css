@@ -207,11 +207,29 @@ html[data-nanairo-text-scale="5"] .context-metrics { grid-template-columns: 1fr;
 .install-card h3 { font-size: 20px; margin: 0 0 5px; }
 .install-card header p { font-size: 12px; color: var(--muted); margin: 0; }
 .step-badge { display: grid; place-items: center; width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: var(--soft); color: var(--teal); font-size: 12px; }
+.code-disclosure { border: 1px solid #dfe7e5; border-radius: 16px; background: #f7f9f8; overflow: hidden; }
+.code-disclosure summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 58px; padding: 10px 16px 10px 20px; color: var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; }
+.code-disclosure summary::-webkit-details-marker { display: none; }
+.code-disclosure summary:hover { background: #edf4f1; }
+.code-disclosure summary i { position: relative; display: block; width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%; background: var(--teal); box-shadow: 0 6px 14px #285c6024; }
+.code-disclosure summary i::before,
+.code-disclosure summary i::after { content: ""; position: absolute; top: 50%; left: 50%; width: 14px; height: 2px; border-radius: 2px; background: #fff; transform: translate(-50%, -50%); transition: transform .24s ease, opacity .24s ease; }
+.code-disclosure summary i::after { transform: translate(-50%, -50%) rotate(90deg); }
+.code-disclosure[open] summary i::after { opacity: 0; transform: translate(-50%, -50%) rotate(0); }
+.code-disclosure .close-label { display: none; }
+.code-disclosure[open] .open-label { display: none; }
+.code-disclosure[open] .close-label { display: inline; }
+.code-disclosure[open] .code-wrap { animation: disclosure-in .28s ease both; }
 .code-wrap { position: relative; border-radius: 16px; overflow: hidden; background: #222936; }
+.code-disclosure .code-wrap { border-radius: 0; border-top: 1px solid #ffffff24; }
 pre { margin: 0; padding: 50px 24px 24px; overflow-x: auto; color: #edf1ef; font: 12px/1.9 ui-monospace, monospace; }
 code .accent { color: #a2d6bc; }
 .copy-button { position: absolute; right: 12px; top: 10px; min-height: 32px; padding: 5px 12px; border: 1px solid #ffffff55; border-radius: 999px; background: transparent; color: #fff; font-size: 11px; cursor: pointer; }
 .copy-button:hover { background: #ffffff20; }
+@keyframes disclosure-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 .install-notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 24px; }
 .install-notes p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.9; }
 .install-notes strong { display: block; margin-bottom: 6px; color: var(--ink); font-size: 13px; }
