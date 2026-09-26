@@ -10,7 +10,7 @@ import reenieBeanieUrl from './assets/reenie-beanie-regular.woff2?inline';
 
 let instanceCount = 0;
 
-const icon = (name: 'spark' | 'accessibility' | 'close' | 'minus' | 'plus' | 'type' | 'spacing' | 'link' | 'contrast' | 'font' | 'motion' | 'guide' | 'mask' | 'speech' | 'media' | 'audit' | 'reset') => {
+const icon = (name: 'spark' | 'accessibility' | 'close' | 'minus' | 'plus' | 'type' | 'spacing' | 'link' | 'contrast' | 'font' | 'motion' | 'guide' | 'mask' | 'speech' | 'media' | 'audit' | 'reset' | 'external') => {
   const paths = {
     spark: svg`<path d="M12 2.75c.62 3.67 2.58 5.63 6.25 6.25-3.67.62-5.63 2.58-6.25 6.25C11.38 11.58 9.42 9.62 5.75 9 9.42 8.38 11.38 6.42 12 2.75Z"></path><path d="M18.4 14.3c.28 1.66 1.17 2.55 2.83 2.83-1.66.28-2.55 1.17-2.83 2.83-.28-1.66-1.17-2.55-2.83-2.83 1.66-.28 2.55-1.17 2.83-2.83Z"></path>`,
     accessibility: svg`<circle cx="12" cy="12" r="9.25"></circle><circle cx="12" cy="7" r="1.35" fill="currentColor" stroke="none"></circle><path d="M6.8 10.2c3.5 1.15 6.9 1.15 10.4 0M12 10.7v4M12 14.7 8.8 19M12 14.7l3.2 4.3"></path>`,
@@ -29,6 +29,7 @@ const icon = (name: 'spark' | 'accessibility' | 'close' | 'minus' | 'plus' | 'ty
     media: svg`<rect x="3.5" y="5" width="17" height="14" rx="2.5"></rect><path d="m9 9.2 5 2.8-5 2.8V9.2ZM4 4l16 16"></path>`,
     audit: svg`<path d="M9.5 5H6.8A1.8 1.8 0 0 0 5 6.8v10.4A1.8 1.8 0 0 0 6.8 19h10.4a1.8 1.8 0 0 0 1.8-1.8v-3.1M9 12l2.1 2.1L19 6.2"></path>`,
     reset: svg`<path d="M4.5 8A8 8 0 1 1 4 14M4.5 8V3.5M4.5 8H9"></path>`,
+    external: svg`<path d="M14 5h5v5M19 5l-8 8"></path><path d="M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5"></path>`,
   };
 
   return html`<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${paths[name]}</svg>`;
@@ -288,7 +289,14 @@ export class NanairoAccessibility extends LitElement {
               <span class="brand-mark" aria-hidden="true"><img src=${logoMarkUrl} alt="" /></span>
               <span>
                 <strong id="nanairo-panel-title">${this.t('title')}</strong>
-                <small>${this.t('subtitle')}</small>
+                <a
+                  class="accessibility-tag"
+                  href="http://nanairo.design/accessibility-tools"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>${this.t('subtitle')}</span>${icon('external')}
+                </a>
               </span>
             </div>
             <button class="icon-button close-button" type="button" aria-label=${this.t('close')} @click=${() => this.closePanel(true)}>
@@ -416,10 +424,16 @@ export class NanairoAccessibility extends LitElement {
           <footer class="panel-footer">
             <button class="reset-button" type="button" @click=${this.reset}>${icon('reset')}<span>${this.t('reset')}</span></button>
             ${this.showBranding ? html`
-              <span class="footer-brand">
+              <a
+                class="footer-brand"
+                href="http://nanairo.design/accessibility-tools"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="NANAiRO accessibility tools"
+              >
                 <span class="powered-by">Powered by</span>
                 <img src=${logoHorizontalUrl} alt="NANAiRO" />
-              </span>
+              </a>
             ` : nothing}
           </footer>
           <span class="sr-only" aria-live="polite">${this.announcement || nothing}</span>
@@ -493,7 +507,7 @@ export class NanairoAccessibility extends LitElement {
     :host([position="left"]) .launcher { animation-name: launcher-invite-left; }
     .launcher:hover { width: 130px; background: var(--accent-hover); }
     .launcher:active { transform: translateY(-50%) scale(.97); }
-    .launcher:focus-visible, button:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .launcher:focus-visible, button:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
     .launcher:focus-visible { outline-offset: -4px; outline-color: #fff; }
     .preference-row:focus-visible { outline-offset: -4px; }
     .launcher-mark { position: relative; width: 36px; height: 36px; display: grid; place-items: center; flex: none; color: var(--accent); border-radius: 50%; background: #fff; transition: opacity .18s ease, transform .28s ease; }
@@ -544,9 +558,11 @@ export class NanairoAccessibility extends LitElement {
     .brand-mark, .feature-icon { display: grid; place-items: center; flex: none; }
     .brand-mark { width: 44px; height: 44px; padding: 5px; }
     .brand-mark img { display: block; width: 100%; height: 100%; object-fit: contain; }
-    .brand strong, .brand small { display: block; }
+    .brand strong { display: block; }
     .brand strong { font-size: 18px; line-height: 1.25; letter-spacing: -.02em; }
-    .brand small { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+    .accessibility-tag { width: fit-content; display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; padding: 5px 9px; color: #285c60; border: 1px solid #b9d2ca; border-radius: 9999px; background: #edf5f2; font-size: 10px; font-weight: 700; line-height: 1.35; text-decoration: none; overflow-wrap: anywhere; transition: color .2s ease, border-color .2s ease, background .2s ease; }
+    .accessibility-tag:hover { color: #fff; border-color: var(--accent); background: var(--accent); }
+    .accessibility-tag svg { width: 13px; height: 13px; flex: none; stroke-width: 1.9; }
 
     .icon-button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; flex: none; cursor: pointer; color: var(--ink); border: 1px solid var(--line); border-radius: 50%; background: #fff; }
     .icon-button:hover { background: var(--soft); border-color: var(--accent); }
@@ -625,7 +641,8 @@ export class NanairoAccessibility extends LitElement {
     .reset-button { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 9px 14px; cursor: pointer; color: var(--ink); border: 1px solid var(--line); border-radius: 9999px; background: #fff; font-size: 12px; font-weight: 650; }
     .reset-button:hover { color: var(--accent-hover); border-color: var(--accent); background: var(--soft); }
     .reset-button svg { width: 17px; height: 17px; }
-    .footer-brand { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); white-space: nowrap; }
+    .footer-brand { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); text-decoration: none; white-space: nowrap; border-radius: 8px; }
+    .footer-brand:hover img { opacity: .72; }
     .powered-by { color: #6b7280; font-family: "Reenie Beanie", cursive; font-size: 18px; font-weight: 400; letter-spacing: normal; line-height: 1; }
     .footer-brand img { width: 72px; height: auto; object-fit: contain; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
@@ -667,7 +684,7 @@ export class NanairoAccessibility extends LitElement {
     @media (prefers-contrast: more) {
       .panel { border: 2px solid #182233; background: #fff; box-shadow: 0 14px 40px rgba(0,0,0,.25); backdrop-filter: none; }
       .scale-card, .preference-group { border-color: #677386; background: #fff; }
-      .preference-hint, .note, .brand small { color: #4b5565; }
+      .preference-hint, .note { color: #4b5565; }
     }
 
     @media (prefers-reduced-transparency: reduce) {

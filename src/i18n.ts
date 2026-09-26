@@ -4,8 +4,8 @@ export const messages = {
   ja: {
     open: 'アクセシビリティ設定を開く',
     close: 'アクセシビリティ設定を閉じる',
-    title: '表示サポート',
-    subtitle: '見やすさを、あなた好みに。',
+    title: '表示サポートツール',
+    subtitle: 'ウェブアクセシビリティ（無料入手）',
     language: '表示言語',
     appearance: '文字と表示',
     colorModes: 'カラーモード',
@@ -62,8 +62,8 @@ export const messages = {
   en: {
     open: 'Open accessibility preferences',
     close: 'Close accessibility preferences',
-    title: 'Display support',
-    subtitle: 'Make this page comfortable for you.',
+    title: 'Display support tool',
+    subtitle: 'Web accessibility (Free download)',
     language: 'Language',
     appearance: 'Text & display',
     colorModes: 'Color mode',
