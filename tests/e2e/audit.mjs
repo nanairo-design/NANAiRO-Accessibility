@@ -201,7 +201,7 @@ async function main() {
     const contrast = byLabel((await readAudit(defects)).items, 'コントラスト');
     check(`still detected with ${mode} active`, contrast?.status === 'warning' && contrast?.count === 1, JSON.stringify(contrast));
   }
-  await widget(defects).locator('.color-mode', { hasText: '標準' }).click();
+  await widget(defects).locator('.color-mode', { hasText: 'グラスビュー' }).click();
   await defects.waitForTimeout(280);
   check(
     'the colour mode is restored after the audit',

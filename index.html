@@ -167,16 +167,18 @@
 
       <section id="install" class="section" aria-labelledby="install-title">
         <div class="section-intro">
-          <h2 id="install-title">貼り付け方。</h2>
+          <h2 id="install-title">インストール方法</h2>
           <span class="eyebrow">Installation</span>
           <p>WordPressなら専用プラグイン版を選べます。「ReactやVueを使っている」と言われたらnpm版、通常のHTMLを直接編集できる場合はCDN版です。</p>
         </div>
         <div class="install-grid">
           <article class="install-card">
             <header><div><h3>npm版</h3><p>この作業は制作会社または開発担当者へ依頼できます</p></div><span class="step-badge">01</span></header>
-            <div class="code-wrap">
-              <button class="copy-button" type="button" data-copy="npm-code">コピー</button>
-              <pre id="npm-code"><code>npm install ./nanairo-accessibility-0.1.0.tgz
+            <details class="code-disclosure">
+              <summary><span class="open-label">コードを表示</span><span class="close-label">コードを閉じる</span><i aria-hidden="true"></i></summary>
+              <div class="code-wrap">
+                <button class="copy-button" type="button" data-copy="npm-code">コピー</button>
+                <pre id="npm-code"><code>npm install ./nanairo-accessibility-0.1.0.tgz
 
 <span class="accent">import</span> { init } <span class="accent">from</span> '@nanairo/accessibility';
 
@@ -184,27 +186,34 @@ init({
   locale: 'ja',
   position: 'right'
 });</code></pre>
-            </div>
+              </div>
+            </details>
             <div class="install-notes"><p><strong>1. 担当者へ渡す</strong>ダウンロードした.tgzファイルを、サイトを管理する制作会社や開発者へ渡します。</p><p><strong>2. 組み込んでもらう</strong>担当者が上記のコマンドを実行し、サイトのプログラムへ追加します。</p><p><strong>3. 全ページで確認</strong>右端に「表示サポート」が表示され、各機能が動くことを確認します。</p></div>
           </article>
           <article class="install-card">
             <header><div><h3>CDN／セルフホスト版</h3><p>HTMLの共通部分を編集できる方向け</p></div><span class="step-badge">02</span></header>
-            <div class="code-wrap">
-              <button class="copy-button" type="button" data-copy="cdn-code">コピー</button>
-              <pre id="cdn-code"><code>&lt;script
+            <details class="code-disclosure">
+              <summary><span class="open-label">コードを表示</span><span class="close-label">コードを閉じる</span><i aria-hidden="true"></i></summary>
+              <div class="code-wrap">
+                <button class="copy-button" type="button" data-copy="cdn-code">コピー</button>
+                <pre id="cdn-code"><code>&lt;script
   src="/assets/nanairo-accessibility.iife.js"
   data-nanairo-auto
   data-locale="ja"
   data-position="right"
   defer
 &gt;&lt;/script&gt;</code></pre>
-            </div>
+              </div>
+            </details>
             <div class="install-notes"><p><strong>1. ZIPを開く</strong>中にあるJavaScriptファイルを、画像などを置くサイトのフォルダへアップロードします。</p><p><strong>2. コードを貼る</strong>全ページで共通するHTMLの&lt;/body&gt;直前へ、上のコードをコピーして貼ります。</p><p><strong>3. 表示を確認</strong>srcをアップロード先のURLへ合わせ、右端に「表示サポート」が出れば完了です。</p></div>
           </article>
           <article class="install-card">
             <header><div><h3>WordPress版</h3><p>管理画面だけで導入したい方向け</p></div><span class="step-badge">03</span></header>
-            <div class="code-wrap"><pre><code>管理画面 → プラグイン → 新規プラグインを追加
+            <details class="code-disclosure">
+              <summary><span class="open-label">手順を表示</span><span class="close-label">手順を閉じる</span><i aria-hidden="true"></i></summary>
+              <div class="code-wrap"><pre><code>管理画面 → プラグイン → 新規プラグインを追加
 → プラグインのアップロード → ZIPを選択</code></pre></div>
+            </details>
             <div class="install-notes"><p><strong>1. ZIPを選ぶ</strong>WordPress版のZIPを解凍せず、そのまま管理画面からアップロードします。</p><p><strong>2. 有効化する</strong>「今すぐインストール」の後に「プラグインを有効化」を押します。</p><p><strong>3. 表示を設定</strong>「設定 → NANAiRO Accessibility」で、日本語／英語とボタン位置を選びます。</p></div>
           </article>
         </div>

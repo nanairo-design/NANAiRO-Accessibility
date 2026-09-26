@@ -9,6 +9,7 @@
  * Set NANAIRO_E2E_CHROMIUM to use an existing binary instead.
  */
 import { chromium } from 'playwright';
+import { PNG } from 'pngjs';
 import { cpSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -123,6 +124,48 @@ const openPanel = async (page) => {
   await page.waitForTimeout(320);
 };
 
+/**
+ * The panel is translucent with a backdrop blur, so its text sits on whatever
+ * the host page shows through it rather than on a colour the stylesheet names.
+ * Only a rendered pixel answers what the contrast actually is.
+ */
+const PANEL_BACKDROPS = {
+  black: 'background:#000',
+  saturated: 'background:linear-gradient(120deg,#ff0040,#0033ff 50%,#00ff66)',
+  stripes: 'background:repeating-linear-gradient(45deg,#111 0 14px,#eee 14px 28px)',
+};
+
+const backdropPage = (style) => `<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<style>html,body{margin:0;height:100%} body{${style}}</style></head>
+<body><main><h1>\u80cc\u666f</h1></main>
+<script src="./${BUNDLE}" data-nanairo-auto data-locale="ja" defer></script></body></html>`;
+
+const channel = (value) => { const v = value / 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+const pixelLuminance = ([r, g, b]) => 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+const pixelRatio = (a, b) => {
+  const [high, low] = [pixelLuminance(a), pixelLuminance(b)].sort((x, y) => y - x);
+  return (high + 0.05) / (low + 0.05);
+};
+
+/** The most common pixel in the element's box that is not part of a glyph. */
+function dominantBackground(shot, rect, foreground) {
+  const tally = new Map();
+  for (let y = rect.y; y < rect.y + rect.h; y += 1) {
+    for (let x = rect.x; x < rect.x + rect.w; x += 1) {
+      if (x < 0 || y < 0 || x >= shot.width || y >= shot.height) continue;
+      const i = (shot.width * y + x) << 2;
+      const pixel = [shot.data[i], shot.data[i + 1], shot.data[i + 2]];
+      // Antialiased glyph edges are not background; on a tight box they can
+      // outnumber it and the ratio degenerates to 1:1.
+      if (pixel.every((value, index) => Math.abs(value - foreground[index]) < 60)) continue;
+      const key = pixel.join(',');
+      tally.set(key, (tally.get(key) ?? 0) + 1);
+    }
+  }
+  const ranked = [...tally.entries()].sort((a, b) => b[1] - a[1]);
+  return ranked.length ? ranked[0][0].split(',').map(Number) : undefined;
+}
+
 async function main() {
   const workdir = mkdtempSync(join(tmpdir(), 'nanairo-e2e-'));
   cpSync(join(root, 'dist', BUNDLE), join(workdir, BUNDLE));
@@ -196,7 +239,7 @@ async function main() {
     );
   }
 
-  await shadow(page).locator('.color-mode', { hasText: '標準' }).click();
+  await shadow(page).locator('.color-mode', { hasText: 'グラスビュー' }).click();
   await page.waitForTimeout(200);
 
   // ---- radiogroup keyboard interaction ------------------------------------
@@ -207,15 +250,15 @@ async function main() {
   });
   check('is a single tab stop', tabStops === 1, `${tabStops} tabbable radio(s)`);
 
-  await shadow(page).locator('.color-mode', { hasText: '標準' }).focus();
+  await shadow(page).locator('.color-mode', { hasText: 'グラスビュー' }).focus();
   await page.keyboard.press('ArrowRight');
   await page.waitForTimeout(220);
   const afterRight = await page.evaluate(() => ({
     mode: document.documentElement.dataset.nanairoColor,
     focused: document.querySelector('nanairo-accessibility').shadowRoot.activeElement?.textContent?.trim(),
   }));
-  check('ArrowRight selects the next mode', afterRight.mode === 'dark', `mode=${afterRight.mode}`);
-  check('ArrowRight moves focus with the selection', afterRight.focused === 'ダーク', `focus=${afterRight.focused}`);
+  check('ArrowRight selects the next mode', afterRight.mode === 'light', `mode=${afterRight.mode}`);
+  check('ArrowRight moves focus with the selection', afterRight.focused === 'ライト', `focus=${afterRight.focused}`);
 
   await page.keyboard.press('ArrowLeft');
   await page.waitForTimeout(220);
@@ -287,7 +330,7 @@ async function main() {
   await page.evaluate(() => document.querySelector('nanairo-accessibility').setAttribute('locale', 'fr'));
   await page.waitForTimeout(300);
   check('does not raise an error', errors.length === before, errors.slice(before).join(' | '));
-  check('falls back to Japanese', (await shadow(page).locator('#nanairo-panel-title').textContent()) === '表示サポート');
+  check('falls back to Japanese', (await shadow(page).locator('#nanairo-panel-title').textContent()) === '表示サポートツール');
   check('normalizes the attribute', (await shadow(page).getAttribute('locale')) === 'ja');
 
   // ---- stored preferences -------------------------------------------------
@@ -316,6 +359,58 @@ async function main() {
   const persisted = await page.evaluate(() => localStorage.getItem('nanairo:a11y:preferences:v1') ?? '');
   check('drops unknown keys on the next save', !persisted.includes('unknownKey'));
   check('drops non-boolean toggle values on the next save', !persisted.includes('onerror'));
+
+  // ---- the panel's own text over a hostile page ---------------------------
+  console.log('\npanel contrast over the host page');
+  const PANEL_TEXT = ['#nanairo-panel-title', '.brand-subtitle', '.accessibility-tag span', '.section-heading',
+    '.preference-title', '.preference-hint', '.color-heading', '.audit-button', '.reset-button', 'output'];
+  const panelFailures = [];
+  let panelWorst = { ratio: Infinity };
+
+  for (const [name, style] of Object.entries(PANEL_BACKDROPS)) {
+    writeFileSync(join(workdir, `${name}.html`), backdropPage(style));
+    const backdrop = await context.newPage();
+    await backdrop.goto(`file://${join(workdir, `${name}.html`)}`);
+    await backdrop.waitForSelector('nanairo-accessibility', { state: 'attached' });
+    await backdrop.waitForTimeout(250);
+    await backdrop.locator('nanairo-accessibility').locator('.launcher').click();
+    await backdrop.waitForTimeout(700);
+
+    for (const selector of PANEL_TEXT) {
+      const info = await backdrop.evaluate((target) => {
+        const node = document.querySelector('nanairo-accessibility').shadowRoot.querySelector(target);
+        if (!node) return null;
+        node.scrollIntoView({ block: 'center' });
+        const box = node.getBoundingClientRect();
+        const style = getComputedStyle(node);
+        return {
+          color: style.color,
+          fontSize: Number.parseFloat(style.fontSize),
+          weight: Number(style.fontWeight) || 400,
+          rect: { x: Math.round(box.x), y: Math.round(box.y), w: Math.round(box.width), h: Math.round(box.height) },
+        };
+      }, selector);
+      if (!info || info.rect.w < 6 || info.rect.h < 6) continue;
+      await backdrop.waitForTimeout(120);
+
+      const shot = PNG.sync.read(await backdrop.screenshot());
+      const foreground = info.color.match(/[\d.]+/g).slice(0, 3).map(Number);
+      const background = dominantBackground(shot, info.rect, foreground);
+      if (!background) continue;
+      const ratio = Number(pixelRatio(foreground, background).toFixed(2));
+      const large = info.fontSize >= 24 || (info.fontSize >= 18.66 && info.weight >= 700);
+      const required = large ? 3 : WCAG_AA_NORMAL_TEXT;
+      if (ratio < required) panelFailures.push(`${name} ${selector}=${ratio} (needs ${required})`);
+      if (ratio < panelWorst.ratio) panelWorst = { ratio, name, selector };
+    }
+    await backdrop.close();
+  }
+
+  check(
+    'every panel text meets AA over any page background',
+    panelFailures.length === 0,
+    panelFailures.length ? panelFailures.join(', ') : `worst ${panelWorst.ratio}:1 (${panelWorst.selector} on ${panelWorst.name})`,
+  );
 
   // ---- duplicate instance -------------------------------------------------
   console.log('\nduplicate instance');
