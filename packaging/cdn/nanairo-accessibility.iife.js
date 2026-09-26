@@ -212,7 +212,7 @@ html[data-nanairo-motion="reduce"] *::after {
                 <strong id="nanairo-panel-title">${this.t("title")}</strong>
                 <a
                   class="accessibility-tag"
-                  href="http://nanairo.design/accessibility-tools"
+                  href="https://nanairo.design/accessibility-tools"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -347,7 +347,7 @@ html[data-nanairo-motion="reduce"] *::after {
             ${this.showBranding?D`
               <a
                 class="footer-brand"
-                href="http://nanairo.design/accessibility-tools"
+                href="https://nanairo.design/accessibility-tools"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="NANAiRO accessibility tools"
