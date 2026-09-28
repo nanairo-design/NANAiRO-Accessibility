@@ -268,7 +268,7 @@ export class NanairoAccessibility extends LitElement {
         @click=${() => this.open ? this.closePanel(false) : this.openPanel()}
       >
         <span class="launcher-mark" aria-hidden="true">${icon('accessibility')}</span>
-        <span class="launcher-label" aria-hidden="true"><span>表示</span><span>サポート</span></span>
+        <span class="launcher-label" aria-hidden="true">表示サポート</span>
         <span class="launcher-arrow" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"></path></svg>
         </span>
@@ -488,19 +488,19 @@ export class NanairoAccessibility extends LitElement {
       right: 0;
       top: 50%;
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      width: 122px;
-      min-height: 58px;
-      padding: 9px 12px 9px 10px;
+      width: 92px;
+      min-height: 120px;
+      padding: 15px 9px 16px;
       overflow: hidden;
       cursor: pointer;
       color: white;
       border: 1px solid rgba(255,255,255,.48);
       border-right: 0;
-      border-radius: 13px 0 0 13px;
+      border-radius: 19px 0 0 19px;
       background: linear-gradient(145deg, rgba(68,135,137,.94), rgba(42,96,100,.9));
       box-shadow: 0 12px 32px rgba(24,55,58,.2), inset 0 1px 0 rgba(255,255,255,.32);
       -webkit-backdrop-filter: blur(22px) saturate(165%);
@@ -510,16 +510,17 @@ export class NanairoAccessibility extends LitElement {
       animation: launcher-invite 1.8s ease-out 1s 2;
     }
 
-    :host([position="left"]) .launcher { right: auto; left: 0; border-right: 1px solid var(--accent); border-left: 0; border-radius: 0 13px 13px 0; }
+    :host([position="left"]) .launcher { right: auto; left: 0; border-right: 1px solid var(--accent); border-left: 0; border-radius: 0 19px 19px 0; }
     :host([position="left"]) .launcher { animation-name: launcher-invite-left; }
-    .launcher:hover { width: 130px; background: linear-gradient(145deg, rgba(72,143,145,.98), rgba(38,88,92,.96)); }
+    .launcher:hover { background: linear-gradient(145deg, rgba(72,143,145,.98), rgba(38,88,92,.96)); box-shadow: 0 16px 38px rgba(24,55,58,.28), inset 0 1px 0 rgba(255,255,255,.4); }
     .launcher:active { transform: translateY(-50%) scale(.97); }
     .launcher:focus-visible, button:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
     .launcher:focus-visible { outline-offset: -4px; outline-color: #fff; }
     .preference-row:focus-visible { outline-offset: -4px; }
-    .launcher-mark { position: relative; width: 36px; height: 36px; display: grid; place-items: center; flex: none; color: var(--accent); border-radius: 50%; background: #fff; transition: opacity .18s ease, transform .28s ease; }
-    .launcher-mark svg { width: 23px; height: 23px; stroke-width: 1.8; }
-    .launcher-label { display: grid; justify-items: start; gap: 1px; font-size: 12px; font-weight: 800; letter-spacing: .05em; line-height: 1.08; text-align: left; writing-mode: horizontal-tb; transition: opacity .18s ease, transform .28s ease; }
+    .launcher-mark { position: relative; width: 42px; height: 42px; display: grid; place-items: center; flex: none; color: var(--accent); border-radius: 50%; background: #fff; transition: opacity .18s ease, transform .28s ease; }
+    .launcher:hover .launcher-mark { transform: translateY(-2px) scale(1.04); }
+    .launcher-mark svg { width: 25px; height: 25px; stroke-width: 1.8; }
+    .launcher-label { display: block; font-size: 12px; font-weight: 800; letter-spacing: .03em; line-height: 1.3; text-align: center; white-space: nowrap; writing-mode: horizontal-tb; transition: opacity .18s ease, transform .28s ease; }
     .launcher-arrow { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: scale(.82); transition: opacity .22s ease .12s, transform .36s cubic-bezier(.22,.8,.2,1) .08s; }
     .launcher-arrow svg { width: 24px; height: 24px; stroke-width: 1.7; }
     .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 46px; min-height: 62px; padding: 0; border-radius: 12px 0 0 12px; animation: none; }
@@ -659,22 +660,21 @@ export class NanairoAccessibility extends LitElement {
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
     @keyframes launcher-invite {
-      0%, 100% { transform: translate(0, -50%); }
-      45% { transform: translate(-4px, -50%); }
+      0%, 100% { transform: translateY(-50%); box-shadow: 0 12px 32px rgba(24,55,58,.2), inset 0 1px 0 rgba(255,255,255,.32); }
+      45% { transform: translateY(-50%); box-shadow: 0 16px 42px rgba(24,55,58,.34), 0 0 0 4px rgba(57,117,121,.12), inset 0 1px 0 rgba(255,255,255,.4); }
     }
 
     @keyframes launcher-invite-left {
-      0%, 100% { transform: translate(0, -50%); }
-      45% { transform: translate(4px, -50%); }
+      0%, 100% { transform: translateY(-50%); box-shadow: 0 12px 32px rgba(24,55,58,.2), inset 0 1px 0 rgba(255,255,255,.32); }
+      45% { transform: translateY(-50%); box-shadow: 0 16px 42px rgba(24,55,58,.34), 0 0 0 4px rgba(57,117,121,.12), inset 0 1px 0 rgba(255,255,255,.4); }
     }
 
     @media (max-width: 520px) {
       :host { --drawer-width: 100vw; }
-      .launcher { width: 108px; min-height: 51px; gap: 8px; padding: 7px 10px 7px 8px; border-radius: 10px 0 0 10px; }
-      :host([position="left"]) .launcher { border-radius: 0 11px 11px 0; }
-      .launcher:hover { width: 114px; }
-      .launcher-mark { width: 32px; height: 32px; }
-      .launcher-mark svg { width: 20px; height: 20px; }
+      .launcher { width: 82px; min-height: 104px; gap: 8px; padding: 12px 7px 13px; border-radius: 16px 0 0 16px; }
+      :host([position="left"]) .launcher { border-radius: 0 16px 16px 0; }
+      .launcher-mark { width: 38px; height: 38px; }
+      .launcher-mark svg { width: 22px; height: 22px; }
       .launcher-label { font-size: 11px; }
       .launcher[aria-expanded="true"] { display: none; }
       .panel,
