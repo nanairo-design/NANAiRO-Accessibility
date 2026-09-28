@@ -268,7 +268,6 @@ export class NanairoAccessibility extends LitElement {
         @click=${() => this.open ? this.closePanel(false) : this.openPanel()}
       >
         <span class="launcher-mark" aria-hidden="true">${icon('accessibility')}</span>
-        <span class="launcher-label" aria-hidden="true"><span>表示</span><span>サポート</span></span>
         <span class="launcher-arrow" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"></path></svg>
         </span>
@@ -491,7 +490,7 @@ export class NanairoAccessibility extends LitElement {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
+      gap: 0;
       width: 46px;
       height: 62px;
       min-height: 62px;
@@ -521,14 +520,12 @@ export class NanairoAccessibility extends LitElement {
     .launcher-mark { position: relative; width: 26px; height: 26px; display: grid; place-items: center; flex: none; color: var(--accent); border-radius: 50%; background: #fff; transition: opacity .18s ease, transform .28s ease; }
     .launcher:hover .launcher-mark { transform: translateY(-2px) scale(1.04); }
     .launcher-mark svg { width: 16px; height: 16px; stroke-width: 1.9; }
-    .launcher-label { display: grid; gap: 0; justify-items: center; font-size: 9px; font-weight: 800; letter-spacing: .02em; line-height: 1.08; text-align: center; white-space: nowrap; writing-mode: horizontal-tb; transition: opacity .18s ease, transform .28s ease; }
     .launcher-arrow { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: scale(.82); transition: opacity .22s ease .12s, transform .36s cubic-bezier(.22,.8,.2,1) .08s; }
     .launcher-arrow svg { width: 24px; height: 24px; stroke-width: 1.7; }
     .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 46px; min-height: 62px; padding: 0; border-radius: 12px 0 0 12px; animation: none; }
     .launcher[aria-expanded="true"]:hover { width: 46px; }
     .launcher[aria-expanded="true"]:active { transform: translateY(-50%) scale(.97); }
-    .launcher[aria-expanded="true"] .launcher-mark,
-    .launcher[aria-expanded="true"] .launcher-label { opacity: 0; transform: scale(.84); }
+    .launcher[aria-expanded="true"] .launcher-mark { opacity: 0; transform: scale(.84); }
     .launcher[aria-expanded="true"] .launcher-arrow { opacity: 1; transform: scale(1); }
     :host([position="left"]) .launcher[aria-expanded="true"] { right: auto; left: var(--drawer-width); border-radius: 0 14px 14px 0; }
     :host([position="left"]) .launcher[aria-expanded="true"] .launcher-arrow { transform: scaleX(-1); }
@@ -672,11 +669,10 @@ export class NanairoAccessibility extends LitElement {
 
     @media (max-width: 520px) {
       :host { --drawer-width: 100vw; }
-      .launcher { width: 46px; height: 62px; min-height: 62px; gap: 3px; padding: 5px 3px; border-radius: 12px 0 0 12px; }
+      .launcher { width: 46px; height: 62px; min-height: 62px; gap: 0; padding: 5px 3px; border-radius: 12px 0 0 12px; }
       :host([position="left"]) .launcher { border-radius: 0 12px 12px 0; }
       .launcher-mark { width: 26px; height: 26px; }
       .launcher-mark svg { width: 16px; height: 16px; }
-      .launcher-label { font-size: 9px; }
       .launcher[aria-expanded="true"] { display: none; }
       .panel,
       :host([position="left"]) .panel {
