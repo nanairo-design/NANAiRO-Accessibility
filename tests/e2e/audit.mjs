@@ -201,7 +201,7 @@ async function main() {
     const contrast = byLabel((await readAudit(defects)).items, 'コントラスト');
     check(`still detected with ${mode} active`, contrast?.status === 'warning' && contrast?.count === 1, JSON.stringify(contrast));
   }
-  await widget(defects).locator('.color-mode', { hasText: 'グラスビュー' }).click();
+  await widget(defects).locator('.color-mode', { hasText: '標準' }).click();
   await defects.waitForTimeout(280);
   check(
     'the colour mode is restored after the audit',
@@ -255,10 +255,11 @@ async function main() {
   // ---- encoding ------------------------------------------------------------
   console.log('\nShift_JIS page');
   const sjis = await load('sjis.html');
-  const launcherText = await sjis.evaluate(
-    () => [...document.querySelector('nanairo-accessibility').shadowRoot.querySelectorAll('.launcher-label span')].map((node) => node.textContent).join('/'),
+  // The launcher is icon-only, so its accessible name carries the Japanese.
+  const launcherName = await sjis.evaluate(
+    () => document.querySelector('nanairo-accessibility').shadowRoot.querySelector('.launcher').getAttribute('aria-label'),
   );
-  check('the widget UI is not mojibake', launcherText === '表示/サポート', JSON.stringify(launcherText));
+  check('the widget UI is not mojibake', launcherName === 'アクセシビリティ設定を開く', JSON.stringify(launcherName));
   await openPanel(sjis);
   await runAudit(sjis);
   check(

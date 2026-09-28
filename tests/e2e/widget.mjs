@@ -239,7 +239,7 @@ async function main() {
     );
   }
 
-  await shadow(page).locator('.color-mode', { hasText: 'グラスビュー' }).click();
+  await shadow(page).locator('.color-mode', { hasText: '標準' }).click();
   await page.waitForTimeout(200);
 
   // ---- radiogroup keyboard interaction ------------------------------------
@@ -250,7 +250,7 @@ async function main() {
   });
   check('is a single tab stop', tabStops === 1, `${tabStops} tabbable radio(s)`);
 
-  await shadow(page).locator('.color-mode', { hasText: 'グラスビュー' }).focus();
+  await shadow(page).locator('.color-mode', { hasText: '標準' }).focus();
   await page.keyboard.press('ArrowRight');
   await page.waitForTimeout(220);
   const afterRight = await page.evaluate(() => ({
