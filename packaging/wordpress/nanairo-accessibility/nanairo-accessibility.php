@@ -242,10 +242,16 @@ function nanairo_accessibility_enqueue_widget() {
 			'in_footer' => true,
 		)
 	);
+	/*
+	 * The settings are published *before* the script, and the bundle starts
+	 * itself from them. An 'after' inline script would make WordPress drop the
+	 * 'defer' strategy entirely (see WP_Scripts::filter_eligible_strategies),
+	 * turning this into a blocking request on every page view.
+	 */
 	wp_add_inline_script(
 		$handle,
-		'window.NanairoAccessibility && window.NanairoAccessibility.init(' . wp_json_encode( $config ) . ');',
-		'after'
+		'window.nanairoAccessibilitySettings = ' . wp_json_encode( $config ) . ';',
+		'before'
 	);
 }
 add_action( 'wp_enqueue_scripts', 'nanairo_accessibility_enqueue_widget' );
