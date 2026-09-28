@@ -268,7 +268,7 @@ export class NanairoAccessibility extends LitElement {
         @click=${() => this.open ? this.closePanel(false) : this.openPanel()}
       >
         <span class="launcher-mark" aria-hidden="true">${icon('accessibility')}</span>
-        <span class="launcher-label" aria-hidden="true">表示サポート</span>
+        <span class="launcher-label" aria-hidden="true"><span>表示</span><span>サポート</span></span>
         <span class="launcher-arrow" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"></path></svg>
         </span>
@@ -491,16 +491,17 @@ export class NanairoAccessibility extends LitElement {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      width: 92px;
-      min-height: 120px;
-      padding: 15px 9px 16px;
+      gap: 3px;
+      width: 46px;
+      height: 62px;
+      min-height: 62px;
+      padding: 5px 3px;
       overflow: hidden;
       cursor: pointer;
       color: white;
       border: 1px solid rgba(255,255,255,.48);
       border-right: 0;
-      border-radius: 19px 0 0 19px;
+      border-radius: 12px 0 0 12px;
       background: linear-gradient(145deg, rgba(68,135,137,.94), rgba(42,96,100,.9));
       box-shadow: 0 12px 32px rgba(24,55,58,.2), inset 0 1px 0 rgba(255,255,255,.32);
       -webkit-backdrop-filter: blur(22px) saturate(165%);
@@ -510,17 +511,17 @@ export class NanairoAccessibility extends LitElement {
       animation: launcher-invite 1.8s ease-out 1s 2;
     }
 
-    :host([position="left"]) .launcher { right: auto; left: 0; border-right: 1px solid var(--accent); border-left: 0; border-radius: 0 19px 19px 0; }
+    :host([position="left"]) .launcher { right: auto; left: 0; border-right: 1px solid var(--accent); border-left: 0; border-radius: 0 12px 12px 0; }
     :host([position="left"]) .launcher { animation-name: launcher-invite-left; }
     .launcher:hover { background: linear-gradient(145deg, rgba(72,143,145,.98), rgba(38,88,92,.96)); box-shadow: 0 16px 38px rgba(24,55,58,.28), inset 0 1px 0 rgba(255,255,255,.4); }
     .launcher:active { transform: translateY(-50%) scale(.97); }
     .launcher:focus-visible, button:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
     .launcher:focus-visible { outline-offset: -4px; outline-color: #fff; }
     .preference-row:focus-visible { outline-offset: -4px; }
-    .launcher-mark { position: relative; width: 42px; height: 42px; display: grid; place-items: center; flex: none; color: var(--accent); border-radius: 50%; background: #fff; transition: opacity .18s ease, transform .28s ease; }
+    .launcher-mark { position: relative; width: 26px; height: 26px; display: grid; place-items: center; flex: none; color: var(--accent); border-radius: 50%; background: #fff; transition: opacity .18s ease, transform .28s ease; }
     .launcher:hover .launcher-mark { transform: translateY(-2px) scale(1.04); }
-    .launcher-mark svg { width: 25px; height: 25px; stroke-width: 1.8; }
-    .launcher-label { display: block; font-size: 12px; font-weight: 800; letter-spacing: .03em; line-height: 1.3; text-align: center; white-space: nowrap; writing-mode: horizontal-tb; transition: opacity .18s ease, transform .28s ease; }
+    .launcher-mark svg { width: 16px; height: 16px; stroke-width: 1.9; }
+    .launcher-label { display: grid; gap: 0; justify-items: center; font-size: 9px; font-weight: 800; letter-spacing: .02em; line-height: 1.08; text-align: center; white-space: nowrap; writing-mode: horizontal-tb; transition: opacity .18s ease, transform .28s ease; }
     .launcher-arrow { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: scale(.82); transition: opacity .22s ease .12s, transform .36s cubic-bezier(.22,.8,.2,1) .08s; }
     .launcher-arrow svg { width: 24px; height: 24px; stroke-width: 1.7; }
     .launcher[aria-expanded="true"] { right: var(--drawer-width); width: 46px; min-height: 62px; padding: 0; border-radius: 12px 0 0 12px; animation: none; }
@@ -671,11 +672,11 @@ export class NanairoAccessibility extends LitElement {
 
     @media (max-width: 520px) {
       :host { --drawer-width: 100vw; }
-      .launcher { width: 82px; min-height: 104px; gap: 8px; padding: 12px 7px 13px; border-radius: 16px 0 0 16px; }
-      :host([position="left"]) .launcher { border-radius: 0 16px 16px 0; }
-      .launcher-mark { width: 38px; height: 38px; }
-      .launcher-mark svg { width: 22px; height: 22px; }
-      .launcher-label { font-size: 11px; }
+      .launcher { width: 46px; height: 62px; min-height: 62px; gap: 3px; padding: 5px 3px; border-radius: 12px 0 0 12px; }
+      :host([position="left"]) .launcher { border-radius: 0 12px 12px 0; }
+      .launcher-mark { width: 26px; height: 26px; }
+      .launcher-mark svg { width: 16px; height: 16px; }
+      .launcher-label { font-size: 9px; }
       .launcher[aria-expanded="true"] { display: none; }
       .panel,
       :host([position="left"]) .panel {
